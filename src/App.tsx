@@ -1,13 +1,29 @@
 import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
+import { Button, FloatButton } from 'antd'
+import { BrowserRouter, Link } from 'react-router-dom'
+import bgImg from './assets/images/bgImg.jpg'
+
+// import go from './assets/images/go.jpeg'
+import Welcome from '@/pages/index'
+import Page2 from './pages/page2'
+// import Welcome from './pages'
 import './App.css'
+import './app.less'
+import './app.scss'
+import style from '@/app.module.less'
+// import style from './app.module.less'
+import 'antd/dist/reset.css'
+
 
 function App() {
     const [count, setCount] = useState(0)
 
+    // console.log(import.meta.env.VITE_SOME_KEY)
+
     return (
-        <>
+        <BrowserRouter>
             <div>
                 <a href="https://vitejs.dev" target="_blank">
                     <img src={viteLogo} className="logo" alt="Vite logo" />
@@ -15,10 +31,11 @@ function App() {
                 <a href="https://react.dev" target="_blank">
                     <img src={reactLogo} className="logo react" alt="React logo" />
                 </a>
+                <Link to='/a'>To a</Link>
             </div>
-            <h1>Vite + React</h1>
+            <h1>Vite + <span>React</span></h1>
             <div className="card">
-                <button onClick={() => setCount((count) => count + 1)}>
+                <button className={style.btn} onClick={() => setCount((count) => count + 1)}>
                     count is {count}
                 </button>
                 <p>
@@ -28,7 +45,12 @@ function App() {
             <p className="read-the-docs">
                 Click on the Vite and React logos to learn more
             </p>
-        </>
+            <Welcome />
+            <Button>btn</Button>
+            <FloatButton.BackTop></FloatButton.BackTop>
+            <img src={bgImg} alt="bgImg" width={400} />
+            <Page2 />
+        </BrowserRouter>
     )
 }
 
