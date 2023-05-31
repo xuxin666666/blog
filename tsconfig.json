@@ -25,7 +25,9 @@
         "noFallthroughCasesInSwitch": true,
         "paths": {
             "@/*": ["src/*"],
-            "@images/*": ["src/assets/images/*"]
+            "@images/*": ["src/assets/images/*"],
+            "@videos/*": ["src/assets/videos/*"],
+            "@fonts/*": ["src/assets/fonts/*"]
         }
     },
     "include": [

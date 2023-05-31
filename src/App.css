@@ -47,3 +47,10 @@
 body {
     height: initial !important;
 }
+
+.postcss-test {
+    height: 30px;
+    background: blueviolet;
+    user-select: none;
+  }
+  

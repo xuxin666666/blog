@@ -5,15 +5,14 @@ import { Button, FloatButton } from 'antd'
 import { BrowserRouter, Link } from 'react-router-dom'
 import bgImg from './assets/images/bgImg.jpg'
 
-// import go from './assets/images/go.jpeg'
+import { CounterProvider } from './pages/useCountModel'
 import Welcome from '@/pages/index'
 import Page2 from './pages/page2'
-// import Welcome from './pages'
+import testVideo from '@videos/testVideo.mp4'
 import './App.css'
 import './app.less'
 import './app.scss'
 import style from '@/app.module.less'
-// import style from './app.module.less'
 import 'antd/dist/reset.css'
 
 
@@ -42,14 +41,21 @@ function App() {
                     Edit <code>src/App.tsx</code> and save to test HMR
                 </p>
             </div>
-            <p className="read-the-docs">
+            <p className="read-the-docs postcss-test">
                 Click on the Vite and React logos to learn more
             </p>
             <Welcome />
             <Button>btn</Button>
             <FloatButton.BackTop></FloatButton.BackTop>
             <img src={bgImg} alt="bgImg" width={400} />
-            <Page2 />
+            <button className={style.btn} onClick={() => setCount((count) => count + 1)}>
+                count is {count}
+            </button>
+            <CounterProvider>
+                <Button>{count}</Button>
+                <Page2 />
+            </CounterProvider>
+            <video src={testVideo} width={400} controls></video>
         </BrowserRouter>
     )
 }

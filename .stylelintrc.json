@@ -1,0 +1,22 @@
+{
+    "extends": [
+        "stylelint-config-standard"
+    ],
+    "rules": {
+        "declaration-empty-line-before": null,
+        "color-function-notation": [
+            "modern",
+            {
+                "ignore": [
+                    "with-var-inside"
+                ]
+            }
+        ],
+        "value-keyword-case": [
+            "lower",
+            {
+                "camelCaseSvgKeywords": true
+            }
+        ]
+    }
+}

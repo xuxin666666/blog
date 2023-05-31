@@ -2,6 +2,7 @@ import path from 'path'
 import { defineConfig } from 'vitest/config'
 // import react from '@vitejs/plugin-react'
 import react from '@vitejs/plugin-react-swc'
+import postcssPresetEnv  from 'postcss-preset-env'
 
 
 
@@ -14,12 +15,27 @@ export default defineConfig({
     resolve: {
         alias: {
             '@/': '/src/',
-            '@images/': '/src/assets/images/'
+            '@images/': '/src/assets/images/',
+            '@videos/': '/src/assets/videos/',
+            '@fonts/': '/src/assets/fonts/'
+        }
+    },
+    css: {
+        devSourcemap: true,
+        preprocessorOptions: {
+            less: {
+                math: 'always'
+            }
+        },
+        postcss: {
+            plugins: [
+                postcssPresetEnv()
+            ]
         }
     },
     envDir: 'config',
     plugins: [
-        react()
+        react(),
     ],
     test: {
         root: rootPath,
