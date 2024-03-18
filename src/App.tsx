@@ -1,61 +1,49 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import { Button, FloatButton } from 'antd'
-import { BrowserRouter, Link } from 'react-router-dom'
-import bgImg from './assets/images/bgImg.jpg'
+import { useEffect, useState } from 'react'
+import { Button, ConfigProvider } from 'antd'
+import { BrowserRouter } from 'react-router-dom'
+import classNames from 'classnames'
+import { MDEditor, MDViewer } from './components/markdown'
 
-import { CounterProvider } from './pages/useCountModel'
+import useTheme from './hooks/useTheme'
 import Welcome from '@/pages/index'
-import Page2 from './pages/page2'
-import testVideo from '@videos/testVideo.mp4'
+import Counter from './pages/Counter'
+import { CounterProvider } from './pages/useCounterStore'
+import { copyToBoardEvent } from './utils/copyToBoard'
+import Header from './components/Layout/Header'
+import { headerTitles } from './utils/constants'
+import style from './app.module.less'
 import './App.css'
-import './app.less'
-import './app.scss'
-import style from '@/app.module.less'
-import 'antd/dist/reset.css'
+
 
 
 function App() {
-    const [count, setCount] = useState(0)
+    const [value, setValue] = useState('')
+    const [theme, changeTheme] = useTheme()
 
     // console.log(import.meta.env.VITE_SOME_KEY)
+    useEffect(() => {
+        const ret = copyToBoardEvent()
+
+        return () => ret()
+    })
 
     return (
         <BrowserRouter>
-            <div>
-                <a href="https://vitejs.dev" target="_blank">
-                    <img src={viteLogo} className="logo" alt="Vite logo" />
-                </a>
-                <a href="https://react.dev" target="_blank">
-                    <img src={reactLogo} className="logo react" alt="React logo" />
-                </a>
-                <Link to='/a'>To a</Link>
-            </div>
-            <h1>Vite + <span>React</span></h1>
-            <div className="card">
-                <button className={style.btn} onClick={() => setCount((count) => count + 1)}>
-                    count is {count}
-                </button>
-                <p>
-                    Edit <code>src/App.tsx</code> and save to test HMR
-                </p>
-            </div>
-            <p className="read-the-docs postcss-test">
-                Click on the Vite and React logos to learn more
-            </p>
-            <Welcome />
-            <Button>btn</Button>
-            <FloatButton.BackTop></FloatButton.BackTop>
-            <img src={bgImg} alt="bgImg" width={400} />
-            <button className={style.btn} onClick={() => setCount((count) => count + 1)}>
-                count is {count}
-            </button>
-            <CounterProvider>
-                <Button>{count}</Button>
-                <Page2 />
-            </CounterProvider>
-            <video src={testVideo} width={400} controls></video>
+            <ConfigProvider theme={theme.antd}>
+                <Header items={headerTitles} />
+                <div className={classNames(style.body)}>
+                    <MDEditor style={{ height: 400 }} value={value} onChange={val => setValue(val)} />
+                    <MDViewer style={{ height: 400 }} value={value} />
+                    <Welcome />
+                    <CounterProvider>
+                        <Counter />
+                    </CounterProvider>
+                    <span>123123嗨</span>
+                    <Button onClick={() => changeTheme('cyan')}>cyan</Button>
+                    <Button onClick={() => changeTheme('purple')}>purple</Button>
+                </div>
+
+            </ConfigProvider>
         </BrowserRouter>
     )
 }

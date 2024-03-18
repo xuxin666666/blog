@@ -1,8 +1,7 @@
 #root {
-    max-width : 1280px;
-    margin    : 0 auto;
-    padding   : 2rem;
-    text-align: center;
+    min-height: 100vh;
+    height: auto;
+    margin    : 0;
 }
 
 .logo {
@@ -36,21 +35,21 @@
     }
 }
 
-.card {
+/* .card {
     padding: 2em;
 }
 
 .read-the-docs {
     color: #888;
+} */
+
+html, body {
+    height: auto;
 }
 
-body {
-    height: initial !important;
-}
-
-.postcss-test {
+/* .postcss-test {
     height: 30px;
     background: blueviolet;
     user-select: none;
-  }
+  } */
   

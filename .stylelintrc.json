@@ -1,11 +1,15 @@
 {
     "extends": [
-        "stylelint-config-standard"
+        "stylelint-config-standard",
+        "stylelint-config-standard-less"
+    ],
+    "plugins": [
+        "stylelint-less"
     ],
     "rules": {
         "declaration-empty-line-before": null,
         "color-function-notation": [
-            "modern",
+            "legacy",
             {
                 "ignore": [
                     "with-var-inside"
@@ -17,6 +21,11 @@
             {
                 "camelCaseSvgKeywords": true
             }
-        ]
+        ],
+        "no-empty-source": null,
+        "at-rule-no-unknown": null,
+        "at-rule-empty-line-before": null,
+        "alpha-value-notation": "number",
+        "media-feature-range-notation": "prefix"
     }
 }

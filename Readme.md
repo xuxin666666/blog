@@ -19,17 +19,26 @@
 |ci     |       |
 |perf   |       |
 
+### stylelint
+[修改规则](https://stylelint.io/user-guide/rules)
+
+### 测试工具 vitest
+
+[指南](https://cn.vitest.dev/guide/)
+
 ### 状态管理库 - hox
+
+[指南](https://hox.js.org/zh/guide/quick-start)
 
 0学习成本，用起来就像使用hooks一样，业务逻辑共享
 
+（已解决）
 v2.1.0 感觉较为严重的bug：[Provider内部的children不受外部state的影响](https://github.com/umijs/hox/issues/97)
 回复中有解决方案，但是是修改源码的，且不知道改动后性能怎么样
-
 规避：先用全局store替代吧
 
 ### 组件样式库 antd
 
 常用的react组件样式库
 
-问题：老问题了，`<React.StrictMode>`下各种报错，其他还没发现，可以去看看[issue](https://github.com/ant-design/ant-design/issues)
+问题：老问题了，`<React.StrictMode>`下各种报错，其他的可以去看看[issue](https://github.com/ant-design/ant-design/issues)

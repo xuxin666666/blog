@@ -1,13 +1,23 @@
-import {Card, QRCode} from 'antd'
+import { Card } from 'antd'
+import {useCountDown, useCountDownLocal} from '@/hooks/useCountDown'
+import { useEffect } from 'react'
 
 const Welcome = () => {
-    
+    const [timeRemain, formatted, toggle] = useCountDown({ remainTime: 15000 })
 
+    const [tm] = useCountDownLocal({key: '123', remainTime: 15000})
+
+    useEffect(() => {
+        // toggle(true)
+    }, [])
     return (
         <div>
-           <QRCode value='123'></QRCode>
-            <Card style={{ height: 600 }}>
-
+            <Card style={{ height: 200 }}>
+                time: {timeRemain}
+                seconds: {formatted.seconds}
+                milliseconds: {formatted.milliseconds}
+                <button onClick={() => toggle()}>click</button>
+                {tm}
             </Card>
         </div>
     )

@@ -10,7 +10,8 @@ const config = defineConfig({
     plugins: [
         viteMockServe({
             mockPath: '/mock/',
-            localEnabled: true
+            localEnabled: true,
+            watchFiles: true
         })
     ],
     server: {

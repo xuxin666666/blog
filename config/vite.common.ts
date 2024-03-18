@@ -1,7 +1,7 @@
 import path from 'path'
 import { defineConfig } from 'vitest/config'
-// import react from '@vitejs/plugin-react'
-import react from '@vitejs/plugin-react-swc'
+import react from '@vitejs/plugin-react'
+// import react from '@vitejs/plugin-react-swc'
 import postcssPresetEnv  from 'postcss-preset-env'
 
 
@@ -24,7 +24,11 @@ export default defineConfig({
         devSourcemap: true,
         preprocessorOptions: {
             less: {
-                math: 'always'
+                math: 'always',
+                additionalData: `
+                    @import "@/styles/theme.less";
+                    @import "@/styles/constants.less";
+                `
             }
         },
         postcss: {
@@ -43,6 +47,7 @@ export default defineConfig({
             'src/**/__tests__/**/*.test.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'
         ],
         environment: 'jsdom',
-        useAtomics: true
+        useAtomics: true,
+        globals: true
     }
 })

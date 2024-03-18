@@ -1,0 +1,80 @@
+.header {
+    // 解决antd model弹窗滚动条消失导致的header内容偏移
+    width: 100vw;
+    right: calc(100% - 100vw);
+
+    position        : fixed;
+    background-color: @colorPrimaryLighter;
+    user-select     : none;
+    height          : @navHeight;
+    padding         : 0 20px;
+    z-index         : 10;
+    transition      : all .3s ease-in-out;
+
+    nav {
+        height         : 100%;
+        display        : flex;
+        justify-content: space-evenly;
+        align-items    : center;
+    }
+}
+
+.tags {
+    .header-item();
+    font-size: @navFontSize;
+}
+
+.hidden-header {
+    box-shadow: none;
+    transform : translateY(-@navHeight);
+}
+
+.header-item {
+    color     : @colorText;
+    font-size : @navIconSize;
+    transition: all ease-in-out .3s;
+
+    &:hover {
+        color: @colorPrimary;
+    }
+}
+
+.header-item a {
+    .header-item()
+}
+
+.header-icons {
+    border-radius   : 5px;
+    // padding      : 5px 0;
+
+    // &:hover {
+    //     background-color: rgba(255, 255, 255, .2);
+    // }
+}
+
+.user {
+    font-size  : 1.3rem;
+    font-weight: 700;
+}
+
+.user-avatar {
+    height       : 42px;
+    width        : 42px;
+    object-fit   : cover;
+    cursor       : pointer;
+
+    img {
+        border-radius: 50%;
+    }
+}
+
+div.fish {
+    z-index   : 1001;
+    transition: .3s opacity ease-in-out;
+}
+
+div.fish-hid {
+    // display: none;
+    opacity: 0;
+    z-index: -1;
+}

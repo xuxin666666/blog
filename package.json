@@ -1,5 +1,5 @@
 {
-    "name": "frame-react",
+    "name": "vite-react-template-bft",
     "private": true,
     "version": "1.0.0",
     "type": "module",
@@ -14,19 +14,36 @@
         "preview": "vite preview --config config/vite.prod.ts"
     },
     "dependencies": {
+        "@ant-design/icons": "^5.1.4",
+        "@bytemd/plugin-frontmatter": "^1.21.0",
+        "@bytemd/plugin-gfm": "^1.21.0",
+        "@bytemd/plugin-highlight": "^1.21.0",
+        "@bytemd/plugin-math": "^1.21.0",
+        "@bytemd/react": "^1.21.0",
+        "ahooks": "^3.7.7",
         "antd": "^5.5.1",
         "axios": "^1.4.0",
+        "bytemd": "^1.21.0",
+        "classnames": "^2.3.2",
+        "dayjs": "^1.11.7",
+        "highlight.js": "^11.8.0",
         "hox": "^2.1.0",
+        "juejin-markdown-themes": "^1.29.7",
+        "katex": "^0.16.7",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
-        "react-router-dom": "^6.11.2"
+        "react-router-dom": "^6.11.2",
+        "store": "^2.0.12"
     },
     "devDependencies": {
         "@commitlint/cli": "^17.6.5",
         "@commitlint/config-conventional": "^17.6.5",
+        "@testing-library/react": "^14.0.0",
+        "@types/jsdom": "^21.1.1",
         "@types/node": "^20.2.5",
         "@types/react": "^18.0.28",
         "@types/react-dom": "^18.0.11",
+        "@types/store": "^2.0.2",
         "@typescript-eslint/eslint-plugin": "^5.57.1",
         "@typescript-eslint/parser": "^5.57.1",
         "@vitejs/plugin-react": "^4.0.0",
@@ -40,13 +57,14 @@
         "less": "^4.1.3",
         "lint-staged": "^13.2.2",
         "mockjs": "^1.1.0",
-        "postcss": "^8.4.24",
-        "postcss-lit": "^1.1.0",
-        "postcss-preset-env": "^8.4.1",
+        "postcss": "^8.4.35",
+        "postcss-preset-env": "^9.5.2",
         "rollup-plugin-visualizer": "^5.9.0",
         "sass": "^1.62.1",
-        "stylelint": "^15.6.2",
+        "stylelint": "^16.2.1",
         "stylelint-config-standard": "^33.0.0",
+        "stylelint-config-standard-less": "3.0.1",
+        "stylelint-less": "3.0.1",
         "typescript": "^5.0.2",
         "vite": "^4.3.2",
         "vite-plugin-compression": "^0.5.1",
@@ -57,7 +75,7 @@
     },
     "lint-staged": {
         "src/**/!(*.test|*.d).{ts,tsx}": "eslint --report-unused-disable-directives --max-warnings 0 --fix",
-        "src/**/*.{css,less,scss,html}": "stylelint --max-warnings 0"
+        "src/**/*.{css,less,scss,html}": "stylelint --max-warnings 0 --fix"
     },
     "commitlint": {
         "extends": [

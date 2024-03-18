@@ -23,12 +23,16 @@
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true,
+
         "paths": {
             "@/*": ["src/*"],
             "@images/*": ["src/assets/images/*"],
             "@videos/*": ["src/assets/videos/*"],
             "@fonts/*": ["src/assets/fonts/*"]
-        }
+        },
+        "types": [
+            "vitest/globals"
+        ]
     },
     "include": [
         "src"

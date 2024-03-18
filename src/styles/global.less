@@ -1,0 +1,36 @@
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: clamp(12px, 2vmin, 20px);
+}
+
+#root {
+    /* max-width : 1280px; */
+    min-height: 100vh;
+    height: auto;
+    margin    : 0 auto;
+    // padding   : 2rem;
+}
+
+body {
+    &::-webkit-scrollbar {
+        width: 12px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        border-radius: 7px;
+        background-color: @colorPrimaryOpac2;
+        
+        &:hover {
+            background-color: @colorPrimaryOpac5;
+        }
+    }
+
+    &::-webkit-scrollbar-track {
+        border-radius: 7px;
+        background: @colorPrimaryOpac2;
+    }
+}
