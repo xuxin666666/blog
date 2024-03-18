@@ -19,6 +19,12 @@
 |ci     |       |
 |perf   |       |
 
+示例：
+```shell
+git commit -m 'feat: 增加 xxx 功能'
+git commit -m 'bug(blog): 修复 xxx 功能'
+```
+
 ### stylelint
 [修改规则](https://stylelint.io/user-guide/rules)
 
