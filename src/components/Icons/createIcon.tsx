@@ -9,14 +9,13 @@ export interface IconOutlined {
 }
 
 const createIcon = (svg: JSX.Element): React.FC<IconOutlined> => {
-    return (props) => {
-        return (
-            <Icon
-                component={() => (svg)}
-                {...props}
-            />
-        )
-    }
+    const ele = React.cloneElement(svg, {width: '1em', height: '1em', fill: 'currentColor'})
+    return (props) => (
+        <Icon
+            component={() => ele}
+            {...props}
+        />
+    )
 }
 
 export default createIcon

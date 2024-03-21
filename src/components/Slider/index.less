@@ -1,0 +1,30 @@
+.c-slider {
+    display: block;
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    position: relative;
+
+    .c-track {
+        height: 100%;
+        width: 0;
+        background-color: white;
+    }
+    
+    .c-dot {
+        cursor: pointer;
+        position: absolute;
+        height: 400%;
+        aspect-ratio: 1/1;
+        top: 50%;
+        transform: translateY(-50%) translateX(-50%);
+        background-color: white;
+        border-radius: 50%;
+        transition: height .3s ease-in-out;
+    
+        &:hover {
+            height: 480%;
+        }
+    }
+}

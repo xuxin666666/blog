@@ -26,5 +26,6 @@ dist-ssr
 
 [1-5].html
 [1-5].js
+[1-5].ts
 [1-5].json
 [1-5].py

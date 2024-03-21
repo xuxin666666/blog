@@ -2,7 +2,7 @@ import { Card } from 'antd'
 import {useCountDown, useCountDownLocal} from '@/hooks/useCountDown'
 import { useEffect } from 'react'
 
-const Welcome = () => {
+const Home = () => {
     const [timeRemain, formatted, toggle] = useCountDown({ remainTime: 15000 })
 
     const [tm] = useCountDownLocal({key: '123', remainTime: 15000})
@@ -23,4 +23,4 @@ const Welcome = () => {
     )
 }
 
-export default Welcome
+export default Home

@@ -1,0 +1,195 @@
+@listContentMargin: 3rem;
+
+.welcome {
+    width              : 100%;
+    height             : 100vh;
+    background-color   : #043978;
+    background-image   : url("/images/bg/bgInstead.jpg");
+    background-repeat  : no-repeat;
+    background-size    : cover;
+    background-position: center;
+    color              : white;
+    user-select        : none;
+
+    &::before {
+        background-color: #0000008f;
+        content         : '';
+        height          : 100%;
+        width           : 100%;
+        display         : block;
+        position        : absolute;
+        z-index         : 0;
+        left            : 0;
+        top             : 0;
+    }
+
+    &>* {
+        position: relative;
+        z-index : 1;
+    }
+
+    &>div {
+        position: absolute;
+        top     : 55%;
+        width   : 70%;
+        left    : 15%;
+    }
+
+    header {
+        font-size  : 3.2rem;
+        font-weight: 600;
+    }
+
+    .line {
+        height : .25rem;
+        width  : 100%;
+        margin : .5rem 0;
+        display: flex;
+        padding: 0;
+    }
+
+    .fixed {
+        height          : 100%;
+        width           : 60%;
+        background-color: white;
+    }
+
+    .slider {
+        height: 100%;
+        width : 40%;
+    }
+
+    span {
+        font-size     : 1.1rem;
+        line-height   : 1.6rem;
+        font-weight   : 600;
+        letter-spacing: .2rem;
+    }
+
+    .music {
+        margin-top: 2rem;
+        float     : right;
+        font-size : 4rem;
+        transition: all ease-in-out .3s;
+
+        &:hover {
+            transform: scale(1.05);
+        }
+    }
+
+    .arrow {
+        font-size: 3rem;
+        position : absolute;
+        bottom   : 3rem;
+        left     : 50%;
+        transform: translateX(-50%);
+        animation: 1.5s arrow-up-down ease-in-out infinite alternate;
+    }
+}
+
+.lists {
+    position   : relative;
+    width      : 100%;
+    height     : auto;
+    user-select: none;
+    overflow   : hidden;
+
+    .item {
+        height         : 15rem;
+        padding        : 2rem;
+        display        : flex;
+        align-items    : center;
+        width          : calc(50% + 5rem);
+        position       : relative;
+        text-decoration: none;
+        transition     : .3s ease-in-out;
+
+        &:hover {
+            opacity: .8;
+        }
+    }
+
+    img {
+        height: 80%;
+    }
+
+    .content {
+        color: white;
+        width: 100%;
+
+        header {
+            font-size  : 2rem;
+            font-weight: 600;
+
+            &::after {
+                content         : '';
+                height          : .15rem;
+                width           : 90%;
+                background-color: white;
+                display         : block;
+                margin          : .25rem 0;
+            }
+        }
+
+        span {
+            font-size: 1.3rem;
+        }
+    }
+
+    .item:nth-child(2n) {
+        flex-direction: row-reverse;
+        padding-left  : 5rem;
+        margin-top    : -10rem;
+        margin-right  : 0;
+        margin-left   : auto;
+        clip-path     : polygon(100% 0, 7.5rem 0, 0 100%, 100% 100%, 100% 0);
+
+        .content {
+            margin-right: @listContentMargin;
+            text-align  : right;
+
+            header {
+                &::after {
+                    margin-right: 0;
+                    margin-left : auto;
+                }
+            }
+        }
+    }
+
+    .item:nth-child(2n + 1) {
+        flex-direction: row;
+        padding-right : 5rem;
+        clip-path     : polygon(0 0, 0 100%, calc(100% - 7.5rem) 100%, 100% 0, 0 0);
+
+        .content {
+            margin-left: @listContentMargin;
+        }
+    }
+
+
+}
+
+@keyframes arrow-up-down {
+    to {
+        transform: translateX(-50%) translateY(1.5rem);
+    }
+}
+
+
+@media screen and (max-width: @mobileWith) {
+    .welcome {
+        background-image   : url("/images/bg/bgImg2.webp");
+        background-size    : cover;
+        background-position: center;
+        padding-top        : 40%;
+    }
+
+    .lists {
+        .item:nth-child(n) {
+            width    : 100%;
+            margin   : 0;
+            clip-path: none;
+        }
+    }
+}

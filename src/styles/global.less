@@ -5,6 +5,12 @@ html, body {
 
 html {
     font-size: clamp(12px, 2vmin, 20px);
+    font-family: 'Source Sans Pro',Helvetica,sans-serif;
+    @font-face {
+        font-family: 'Source Sans Pro';
+        // src: url('https://gstatic.loli.net/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3ik4zwlxdu.woff2');
+        src: url('https://gstatic.loli.net/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3i54rwlxdu.woff2');
+    }
 }
 
 #root {
@@ -17,7 +23,7 @@ html {
 
 body {
     &::-webkit-scrollbar {
-        width: 12px;
+        width: 8px;
     }
 
     &::-webkit-scrollbar-thumb {
@@ -33,4 +39,14 @@ body {
         border-radius: 7px;
         background: @colorPrimaryOpac2;
     }
+}
+
+.mobile {
+    display: none;
+}
+
+@media screen and (max-width: @mobileWith) {
+    .no-mobile {
+        display: none;
+    }    
 }
