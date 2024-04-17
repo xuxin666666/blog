@@ -1,10 +1,10 @@
 import React from "react"
-import { Form, Input, Button } from "antd"
+import { Form, Input, Button, message } from "antd"
 import { LockOutlined } from "@ant-design/icons"
 import { EmailOutlined } from "@/components/Icons";
 import { useUserStore } from "@/globalStore/user";
 import type { FormProps } from 'antd';
-import styles from './index.module.less'
+// import styles from './index.module.less'
 
 
 const useForm = Form.useForm
@@ -16,8 +16,12 @@ const Login: React.FC<{
     const {login, loginLoading} = useUserStore()
 
     const onFinish = (val: any) => {
-        login(val, () => {
+        login(val).then(() => {
             callback?.()
+            message.success('登录成功')
+        }).catch((err) => {
+            message.error('登录失败' + err)
+            console.log(err)
         })
     }
 
@@ -38,7 +42,6 @@ const Login: React.FC<{
     return (
         <Form
             form={form}
-            className={styles.form}
             initialValues={{
                 email: '',
                 password: ''

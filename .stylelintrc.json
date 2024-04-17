@@ -26,6 +26,7 @@
         "at-rule-no-unknown": null,
         "at-rule-empty-line-before": null,
         "alpha-value-notation": "number",
-        "media-feature-range-notation": "prefix"
+        "media-feature-range-notation": "prefix",
+        "no-descending-specificity": null
     }
 }

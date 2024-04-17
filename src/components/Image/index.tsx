@@ -11,7 +11,7 @@ import { imageUrl } from '@/utils/constants'
  * @returns 
  */
 const Image: React.FC<{
-    src: string
+    src?: string
     alt?: string
     width?: string | number
     height?: string | number
@@ -19,7 +19,7 @@ const Image: React.FC<{
     preview?: boolean
     prefix?: boolean
     [key: string]: any
-}> = ({ src, alt = 'img', width, height, className, preview = false, prefix = true, ...other }) => {
+}> = ({ src, alt = 'img', width, height, className, preview = false, prefix = false, ...other }) => {
     return (
         <Img
             src={prefix ? imageUrl + src : src}

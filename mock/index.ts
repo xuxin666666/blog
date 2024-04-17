@@ -28,8 +28,9 @@ export function handleRoutes(routes: MockMethod[]) {
 
 const routes: MockMethod[] = [
     {
-        url: '/api/',
-        statusCode: 404
+        url: '/api',
+        statusCode: 200,
+        response: () => 'hello'
     }
 ]
 export default handleRoutes(routes)

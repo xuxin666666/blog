@@ -4,18 +4,29 @@
     right: calc(100% - 100vw);
 
     position        : fixed;
-    background-color: @colorPrimaryLighter;
     user-select     : none;
     height          : @navHeight;
-    padding         : 0 20px;
+    padding         : 0 3rem;
     z-index         : 10;
     transition      : all .3s ease-in-out;
 
     nav {
         height         : 100%;
         display        : flex;
-        justify-content: space-evenly;
+        justify-content: space-between;
         align-items    : center;
+        color     : #ddd;
+        font-size: @navFontSizeSmaller;
+    }
+
+    & + * {
+        padding-top: @navHeight;
+    }
+}
+
+.header-right {
+    > * {
+        cursor: pointer;
     }
 }
 
@@ -27,10 +38,14 @@
 .hidden-header {
     box-shadow: none;
     transform : translateY(-@navHeight);
+    
+    & + * {
+        padding-top: 0;
+    }
 }
 
 .header-item {
-    color     : @colorText;
+    color     : #ddd;
     font-size : @navIconSize;
     transition: all ease-in-out .3s;
 
@@ -45,11 +60,6 @@
 
 .header-icons {
     border-radius   : 5px;
-    // padding      : 5px 0;
-
-    // &:hover {
-    //     background-color: rgba(255, 255, 255, .2);
-    // }
 }
 
 .user {
@@ -68,13 +78,3 @@
     }
 }
 
-div.fish {
-    z-index   : 1001;
-    transition: .3s opacity ease-in-out;
-}
-
-div.fish-hid {
-    // display: none;
-    opacity: 0;
-    z-index: -1;
-}

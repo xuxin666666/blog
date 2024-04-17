@@ -1,20 +1,16 @@
-import React, { useState } from "react";
-import { createPortal } from "react-dom";
+import React, { useState, useRef, useEffect } from "react";
 import classnames from 'classnames'
 import { useEventListener } from "ahooks";
-import { Link, useNavigate } from "react-router-dom";
-import { Dropdown, Modal, Space } from "antd";
-import { HomeOutlined, BgColorsOutlined, UserOutlined, LogoutOutlined, LoginOutlined } from '@ant-design/icons'
-import { ManageOutlined, NotificationOutlined } from "@/components/Icons";
-import FlyingFish from "@/components/FlyingFish";
-import Image from "@/components/Image";
-import { UserRoleWeight } from "@/api/user";
+import { Link, useLocation } from "react-router-dom";
+import { Modal, Space, message } from "antd";
+import { LogoutOutlined } from '@ant-design/icons'
+
+import { HomeOutlined } from "@/components/Icons";
 import { useUserStore } from "@/globalStore/user";
 import OutLink from "@/components/OutLink";
-import Login from "./login";
-import type { MenuProps } from 'antd';
 
 import style from './index.module.less'
+import { useHomePageListStore } from "@/globalStore/homePageList";
 
 
 
@@ -26,107 +22,104 @@ export interface IHeaderTitles {
 }
 
 const Header: React.FC<{
-    items: IHeaderTitles[]
-}> = ({ items }) => {
-    const navigate = useNavigate()
-    const { userInfo, isLogin, logout } = useUserStore()
+    items?: IHeaderTitles[],
+    children?: React.ReactNode
+    className?: string
+}> = ({ items = [], children, className }) => {
+    const { isLogin, logout } = useUserStore()
+    const { list: homePageList } = useHomePageListStore()
+    const location = useLocation()
 
     const [navShow, setNavShow] = useState(true)
-    const [loginModalVis, setLoginModalVis] = useState(false)
+    const header = useRef<HTMLHeadElement>(null)
+    const touchDeltaY = useRef({ lastPos: 0, deltaY: 0 })
 
-    useEventListener(
-        'wheel',
-        event => {
-            event = event || window.event;
-            if (event.altKey || event.shiftKey || event.ctrlKey) return
-            setNavShow(event.deltaY < 0);
-        },
-        { target: document.body }
-    );
+    useEventListener('wheel', event => {
+        event = event || window.event;
+        if (event.altKey || event.shiftKey || event.ctrlKey) return
+        setNavShow(event.deltaY < 0);
+    }, { target: document.body })
 
-    const toPersonalCenter = () => {
-        navigate('/user')
+    useEventListener('touchstart', event => {
+        touchDeltaY.current.lastPos = event.targetTouches[0].clientY
+        touchDeltaY.current.deltaY = 0
+    }, { target: document.body })
+
+    useEventListener('touchmove', event => {
+        if (event.targetTouches[0]) {
+            const clientY = event.targetTouches[0].clientY
+            let { lastPos, deltaY } = touchDeltaY.current
+            if ((clientY > lastPos && deltaY < 0) || (clientY < lastPos && deltaY > 0)) deltaY = 0
+
+            deltaY += clientY - lastPos
+            lastPos = clientY
+            if (Math.abs(deltaY) > 50) setNavShow(deltaY > 0)
+            touchDeltaY.current.lastPos = lastPos
+            touchDeltaY.current.deltaY = deltaY
+            // console.log(touchDeltaY.current)
+        }
+    }, { target: document.body })
+
+    useEffect(() => {
+        if(!header.current) return
+
+        let ans = '', primary = ''
+        for(const item of homePageList) {
+            if(location.pathname.startsWith(item.to) && item.to.length > ans.length) {
+                ans = item.to
+                if(item.primary) primary = item.primary
+            }
+        }
+        header.current.style.backgroundColor = primary ? primary + 'df' : '#043978'
+    }, [location.pathname, homePageList])
+
+    const onLogout = () => {
+        Modal.confirm({
+            title: '确定退出登录？',
+            okText: '确定',
+            cancelText: '取消',
+            maskClosable: true,
+            onOk() {
+                logout()
+                message.success('已退出登录')
+            }
+        })
     }
-
-    const userChangeTheme = () => {
-        console.log('changeTheme')
-    }
-
-    const onLogin = () => {
-        setLoginModalVis(true)
-    }
-
-    const avatar = (
-        <Image className={classnames(style['user-avatar'])} src={userInfo.avatar} />
-    )
-
-    const preson = (
-        <Space className={style.user} size={30}>
-            {avatar}
-            {userInfo.username}
-        </Space>
-    )
-
-    const userMenus: MenuProps['items'] = [
-        { key: 0, label: preson },
-        { type: 'divider' },
-        { key: 1, label: '个人中心', icon: <UserOutlined />, onClick: toPersonalCenter },
-        { key: 2, label: '更改主题', icon: <BgColorsOutlined />, onClick: userChangeTheme },
-        { key: 3, label: '退出登录', icon: <LogoutOutlined />, onClick: logout }
-    ]
 
     return (
-        <>
-            <header className={classnames(style.header, { [style.hiddenHeader]: !navShow })}>
-                <nav>
-                    <Space direction='horizontal' size='middle'>
-                        <Link to='/'>
-                            <HomeOutlined className={style['header-item']} />
-                        </Link>
-                    </Space>
-                    <Space direction='horizontal' size='middle'>
-                        {items.map(item => {
-                            let Comp: React.FC<any>
-                            if (item.out) Comp = OutLink
-                            else Comp = Link
+        <header className={classnames(className, style.header, { [style['hidden-header']]: !navShow })} ref={header}>
+            <nav>
+                <Space direction='horizontal' size='middle'>
+                    <Link to='/'>
+                        <HomeOutlined className={classnames(style['header-item'])} />
+                    </Link>
+                </Space>
+                <Space direction='horizontal' size='middle'>
+                    {items.map(item => {
+                        let Comp: React.FC<any>
+                        if (item.out) Comp = OutLink
+                        else Comp = Link
 
-                            return (
-                                <Comp href={item.path} className={style.tags} key={item.path}>
-                                    <Space>
-                                        {item.icon}
-                                        {item.text}
-                                    </Space>
-                                </Comp>
-                            )
-                        })}
-                    </Space>
-                    <Space direction='horizontal' size='middle'>
-                        {
-                            UserRoleWeight[userInfo.role] > UserRoleWeight.normal && (
-                                <Link to='/admin'>
-                                    <ManageOutlined className={classnames(style['header-item'], style['header-icons'])} />
-                                </Link>
-                            )
-                        }
-                        <NotificationOutlined className={classnames(style['header-icons'], style['header-item'])} />
-                        {isLogin ? (
-                            <Dropdown trigger={['click']} menu={{ items: userMenus }} placement='bottomRight'>
-                                {avatar}
-                            </Dropdown>
-                        ) : (
-                            <LoginOutlined className={classnames(style['header-icons'], style['header-item'])} onClick={onLogin} />
-                        )}
-                    </Space>
-                </nav>
-            </header>
-            <Modal open={loginModalVis} onCancel={() => setLoginModalVis(false)} footer={false} closable={false}>
-                <Login callback={() => setLoginModalVis(false)} />
-            </Modal>
-            {createPortal(
-                <FlyingFish className={classnames(style.fish, { [style['fish-hid']]: !loginModalVis })} />,
-                document.body
-            )}
-        </>
+                        return (
+                            <Comp href={item.path} className={style.tags} key={item.path}>
+                                <Space>
+                                    {item.icon}
+                                    {item.text}
+                                </Space>
+                            </Comp>
+                        )
+                    })}
+                </Space>
+                <Space direction='horizontal' size='middle' className={classnames(style['header-right'])}>
+                    {children}
+                    {
+                        isLogin && (
+                            <LogoutOutlined className={classnames(style['header-item'])} onClick={onLogout} />
+                        )
+                    }
+                </Space>
+            </nav>
+        </header>
     )
 }
 
