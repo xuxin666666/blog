@@ -80,6 +80,52 @@ note、abstract、info、tip、success、question、warning、failure、danger�
 !!!
 
 ## ☘️ 占个坑@！
+
+# 🤖 基本演示 x 2
+
+**加粗**，<u>下划线</u>，_斜体_，~~删除线~~，上标<sup>26</sup>，下标<sub>[1]</sub>，\`inline code\`，[超链接](https://github.com/imzbf)
+
+> 引用：《I Have a Dream》
+
+1. So even though we face the difficulties of today and tomorrow, I still have a dream.
+2. It is a dream deeply rooted in the American dream.
+3. I have a dream that one day this nation will rise up.
+
+--------------
+
+- [ ] 周五
+- [ ] 周六
+- [x] 周天
+
+![图片](https://imzbf.github.io/md-editor-rt/imgs/mark_emoji.gif "yes, that's right!")
+
+# h1-1
+
+## h2-2
+
+### h3-3
+
+## h2-4
+
+## h2-5
+
+### h3-6
+
+# h1-7
+
+# h1-1
+
+## h2-2
+
+### h3-3
+
+### h3-4
+
+### h3-5
+
+### h3-6
+
+# h1-7
 `
 
 const routes: MockMethod[] = [
@@ -144,11 +190,11 @@ const routes: MockMethod[] = [
         },
     },
     {
-        url: '/api/articles/:id',
+        url: '/api/article/:id',
         method: 'get',
         statusCode: 200,
-        response({ url: { id } }) {
-            return Mock.mock({
+        response({ query: { id } }) {
+            let data = Mock.mock({
                 content: articleContent,
                 'views|5-1000': 0,
                 'likes|0-50': 0,
@@ -157,9 +203,19 @@ const routes: MockMethod[] = [
                 title: '@ctitle(5, 15)',
                 createTime: '@datetime(T)',
                 updateTime: '@datetime(T)',
-                id,
+                id
             })
+            data.createTime = parseInt(data.createTime)
+            data.updateTime = parseInt(data.updateTime)
+            return data
         }
+    },
+    {
+        url: '/api/article/:id',
+        method: 'post',
+        response({body: {like = false}}) {
+            return
+        },
     }
 ]
 

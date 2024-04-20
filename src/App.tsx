@@ -1,7 +1,7 @@
 import { useRef, useState, } from 'react'
 import { createPortal } from 'react-dom'
 import { RouterProvider, createBrowserRouter, Navigate } from 'react-router-dom'
-import { Modal} from 'antd'
+import { Modal } from 'antd'
 import { useEventListener, useMount } from 'ahooks'
 import classnames from 'classnames'
 
@@ -30,14 +30,27 @@ const router = createBrowserRouter([
                 index: true,
                 async lazy() {
                     const { ArticleList } = await import('./pages/Article/index.tsx')
-                    return {element: <ArticleList />}
+                    return { element: <ArticleList /> }
                 }
             },
             {
                 path: '/articles/tag/:tagName',
                 async lazy() {
                     const { ArticleList } = await import('./pages/Article/index.tsx')
-                    return {element: <ArticleList />}
+                    return { element: <ArticleList /> }
+                }
+            },
+            {
+                path: '/articles/:id',
+                async lazy() {
+                    const [{ ArticleDetail }, { articleDetailLoader }] = await Promise.all([
+                        import('./pages/Article/index.tsx'),
+                        import('./pages/Article/loader.ts')
+                    ])
+                    return {
+                        element: <ArticleDetail />,
+                        loader: articleDetailLoader
+                    }
                 }
             }
         ]
@@ -72,7 +85,7 @@ function App() {
 
     const addClickCount = () => {
         if (isLogin) return
-        
+
         clickCount.current++
         if (clickCount.current === 5) setLoginModalVis(true)
         setTimeout(() => clickCount.current = 0, 1000)

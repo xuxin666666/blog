@@ -22,7 +22,7 @@ export interface IGetArticleListReturn {
     }[],
     total: number
 }
-export const getArticleList = (props: IGetArticleListProps) => defaultServer.get('/article/list', {params: props}).then<IGetArticleListReturn>(res => res.data)
+export const getArticleList = (props: IGetArticleListProps) => defaultServer.get('/article/list', { params: props }).then<IGetArticleListReturn>(res => res.data)
 
 
 
@@ -43,3 +43,22 @@ export interface IGetArticleStatisticsReturn {
     likes: number
 }
 export const getArticleStatistics = () => defaultServer.get('/article/statistics').then<IGetArticleStatisticsReturn>(res => res.data)
+
+
+
+export interface IGetArticleDetailReturn {
+    id: string,
+    title: string
+    content: string
+    tags: string[]
+    views: number
+    likes: number
+    createTime: number
+    updateTime?: number
+    words: number
+}
+export const getArticleDetail = (id: string) => defaultServer.get(`/article/${id}`).then<IGetArticleDetailReturn>(res => res.data)
+
+
+
+export const setArticleLike = (id: string, like = false) => defaultServer.post(`/article/${id}`, {like}).then<void>(res => res.data)

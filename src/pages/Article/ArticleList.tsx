@@ -130,7 +130,7 @@ const ArticleList: React.FC = () => {
     }
 
     return (
-        <div className={styles.container}>
+        <>
             <div className={styles['search-container']}>
                 {!tagName && <SearchBox className={styles.input} onSearch={search} />}
             </div>
@@ -248,7 +248,7 @@ const ArticleList: React.FC = () => {
                     <TagsCard className={classnames(styles.card, styles['all-tags'])} />
                 </div>
             </div>
-        </div>
+        </>
     )
 }
 
