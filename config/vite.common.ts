@@ -26,7 +26,6 @@ export default defineConfig({
             less: {
                 math: 'always',
                 additionalData: `
-                    @import "@/styles/theme.less";
                     @import "@/styles/constants.less";
                 `
             }

@@ -1,0 +1,77 @@
+.container {
+    height        : calc(100vh - @navHeight);
+    display       : flex;
+    flex-direction: column;
+}
+
+.header {
+    height         : 3rem;
+    flex           : none;
+    display        : flex;
+    padding        : 0 3rem;
+    justify-content: space-between;
+    align-items: center;
+
+    .input {
+        font-size: 1.3rem;
+    }
+
+    .right {
+        margin-left: 2rem;
+    }
+
+}
+
+.save-text {
+    color: gray;
+    word-break: keep-all;
+    font-size: 1.15rem;
+}
+
+.editor {
+    flex: auto;
+}
+
+.modal {
+    --ant-modal-content-padding: 20px 0 20px 24px;
+    --ant-modal-body-padding: 0 24px 0 0;
+    --ant-modal-footer-padding: 0 24px 0 0;
+
+    :global {
+        .ant-modal-body {
+            height: 65vh;
+            overflow: auto;
+        }
+    }
+    
+    .button {
+        margin-left: 50%;
+        transform: translateX(-50%);
+        width: 50%;
+    }
+}
+
+.list-item {
+    .icon {
+        font-size: 1.4rem;
+        transition: all .3s ease-in-out;
+        cursor: pointer;
+    }
+    
+    .delete {    
+        &:hover {
+            color: red;
+        }
+    }
+    
+    .edit {
+        &:hover {
+            color: @colorPrimary;
+        }
+    }
+}
+
+.select {
+    width: 100%;
+}
+

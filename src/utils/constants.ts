@@ -34,8 +34,8 @@ interface IHomePageList {
     subtitle?: string
 }
 export const homePageList: IHomePageList[] = [
-    { image: qilunuo, title: '文章', subtitle: '遨游于知识的海洋', to: '/articles' },
+    { image: qilunuo, title: '文章', subtitle: '遨游于知识的海洋', to: '/article' },
     { image: leimiliya, title: '闲杂话语', subtitle: '没事发发牢骚', to: '/meaningless' },
-    { image: bayiyonglin, title: '找歌', subtitle: '寻一处心灵寄托', to: '/musics' },
+    { image: bayiyonglin, title: '找歌', subtitle: '寻一处心灵寄托', to: '/music' },
     { image: bayunzi, title: '未完待续', subtitle: '啊嘞，这就没了……', to: '' }
 ]

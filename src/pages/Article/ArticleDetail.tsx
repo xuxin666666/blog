@@ -11,6 +11,8 @@ import { UpdateTimeOutlined, WordCountOutlined } from "@/components/Icons";
 import Catalog from "@/components/Catalog";
 import { IGetArticleDetailReturn, setArticleLike } from "@/api/article";
 import styles from './less/articleDetail.module.less'
+import 'md-editor-rt/lib/preview.css';
+import '@/styles/channing-cyan.less'
 
 
 

@@ -4,6 +4,7 @@ import type { HeadList as HL, MdHeadingId } from "md-editor-rt";
 import classnames from 'classnames'
 
 import { useScrollEndEventListener } from "@/hooks";
+import styles from './index.module.less'
 
 
 
@@ -30,7 +31,21 @@ const MenuItem: React.FC<{
 
     useEffect(() => {
         eles.current.forEach((el) => {
-            if(el.getAttribute('data-id') === active) el.scrollIntoView({behavior: 'smooth', block: 'nearest'})
+            if (el.getAttribute('data-id') === active) {
+                // 滚动过程中会中断
+                // 暂未查明原因，可能是滑动过程中碰上了原生事件监听导致中断
+                // el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+
+                // 递归搜索来滚动
+                let scrollTop = 0, element: HTMLElement | null = el
+                while (element) {
+                    if (element.scrollHeight > element.offsetHeight) break
+                    // position为static的话，offsetTop指的是同一个元素，无需重复加
+                    if(element.style.position !== 'static') scrollTop += element.offsetTop
+                    element = element.parentElement
+                }
+                element?.scrollTo({ top: scrollTop - element.offsetHeight / 2, behavior: 'smooth' })
+            }
         })
     }, [active])
 
@@ -73,7 +88,7 @@ const Catalog: React.FC<{
         const elements: HTMLElement[] = []
         catalog.forEach(({ text, level }, index) => {
             const ele = document.getElementById(mdHeadingId(text, level, index + 1))
-            if(ele) elements.push(ele)
+            if (ele) elements.push(ele)
         })
         return elements
     }, [catalog, mdHeadingId])
@@ -100,7 +115,7 @@ const Catalog: React.FC<{
     const [activeItem, setActiveItem] = useState(() => getIdFromHash(window.location.hash))
 
     useScrollEndEventListener(() => {
-        if(!locatedEles.length) return
+        if (!locatedEles.length) return
 
         let el: HTMLElement | undefined
         for (const ele of locatedEles) {
@@ -111,7 +126,7 @@ const Catalog: React.FC<{
         }
         if (!el) el = locatedEles[0]
         setActiveItem(el.id)
-    })
+    }, {delay: 100})
 
     const onItemClick = useMemoizedFn((e: React.MouseEvent<HTMLAnchorElement>) => {
         const id = getIdFromHash(new URL(e.currentTarget.href).hash)
@@ -127,7 +142,7 @@ const Catalog: React.FC<{
 
     if (!catalog.length) return null
     return (
-        <div className={className}>
+        <div className={classnames(className, styles.container)} >
             <MenuItem
                 items={menu}
                 onClick={onItemClick}

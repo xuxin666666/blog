@@ -13,6 +13,9 @@ declare const asserts: (expression: any) => asserts expression
 
 interface StoreJsAPI {
     set(key: string, value: any, expireTime?: number): any;
+    filter<T = any>(callback: (key: string, val: T, index: number) => boolean): {key: string, val: T}[]
+    map<T = any, K = any>(callback: (key: string, val: T, index: number) => K): K[]
+    getAll<T = any>(): {key: string, val: T}[]
 }
 declare const store: StoreJsAPI
 declare module 'store' {

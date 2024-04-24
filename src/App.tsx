@@ -1,83 +1,26 @@
 import { useRef, useState, } from 'react'
 import { createPortal } from 'react-dom'
-import { RouterProvider, createBrowserRouter, Navigate } from 'react-router-dom'
-import { Modal } from 'antd'
+import { Outlet } from 'react-router-dom'
+import { ConfigProvider, Modal, App as AntdApp } from 'antd'
 import { useEventListener, useMount } from 'ahooks'
 import classnames from 'classnames'
+import zhCN from 'antd/locale/zh_CN';
+import 'dayjs/locale/zh-cn';
 
-import HomePage from './pages/HomePage'
+
 import FlyingFish from "@/components/FlyingFish";
 import Login from '@/components/Login'
 import { useUserStore } from '@/globalStore/user'
+import { useThemeStore } from '@/globalStore/useTheme'
 import { isMobile } from './utils/constants.ts'
 import styles from './App.module.less'
 
 
 
-const router = createBrowserRouter([
-    {
-        path: '/',
-        element: <HomePage />
-    },
-    {
-        path: '/articles',
-        async lazy() {
-            const { Article } = await import('./pages/Article/index.tsx')
-            return { element: <Article /> }
-        },
-        children: [
-            {
-                index: true,
-                async lazy() {
-                    const { ArticleList } = await import('./pages/Article/index.tsx')
-                    return { element: <ArticleList /> }
-                }
-            },
-            {
-                path: '/articles/tag/:tagName',
-                async lazy() {
-                    const { ArticleList } = await import('./pages/Article/index.tsx')
-                    return { element: <ArticleList /> }
-                }
-            },
-            {
-                path: '/articles/:id',
-                async lazy() {
-                    const [{ ArticleDetail }, { articleDetailLoader }] = await Promise.all([
-                        import('./pages/Article/index.tsx'),
-                        import('./pages/Article/loader.ts')
-                    ])
-                    return {
-                        element: <ArticleDetail />,
-                        loader: articleDetailLoader
-                    }
-                }
-            }
-        ]
-    },
-    {
-        path: '/musics',
-        async lazy() {
-            const { Music } = await import('./pages/Music/index.tsx')
-            return { element: <Music /> }
-        },
-    },
-    {
-        path: '/meaningless',
-        async lazy() {
-            const { MeaningLess } = await import('./pages/MeaningLess/index.tsx')
-            return { element: <MeaningLess /> }
-        },
-    },
-    {
-        path: '*',
-        element: <Navigate to='/' />
-    }
-])
-
 
 function App() {
     const { isLogin } = useUserStore()
+    const { theme } = useThemeStore()
 
     const [loginModalVis, setLoginModalVis] = useState(false)
 
@@ -100,8 +43,10 @@ function App() {
     })
 
     return (
-        <>
-            <RouterProvider router={router} />
+        <ConfigProvider theme={theme} locale={zhCN}>
+            <AntdApp>
+                <Outlet />
+            </AntdApp>
             <Modal open={loginModalVis} onCancel={() => setLoginModalVis(false)} footer={false} closable={false}>
                 <Login callback={() => setLoginModalVis(false)} />
             </Modal>
@@ -109,7 +54,7 @@ function App() {
                 <FlyingFish className={classnames(styles.fish, { [styles['fish-hid']]: !loginModalVis })} />,
                 document.body
             )}
-        </>
+        </ConfigProvider>
     )
 }
 

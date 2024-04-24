@@ -1,6 +1,8 @@
 @colorPrimary                    : #4dd0e1;
 @colorPrimaryDarker              : #26c6da;
-@colorPrimaryOpc8                : #4dd0e1cc;
+@colorPrimaryLighter             : #e4f8fb;
+@colorPrimaryOpac8               : #4dd0e1cc;
+@colorBorder                     : #26c6da;
 @colorBase                       : #2b2b2b;
 @colorBaseLighter                : #3b3b3b;
 @md-theme-code-block-color       : #a9b7c6;
@@ -8,6 +10,10 @@
 @md-theme-code-before-bg-color   : @md-theme-code-block-bg-color;
 @md-theme-code-copy-tips-color   : #141414;
 @md-theme-code-copy-tips-bg-color: #bbb;
+
+@codeH1BgImage  : var(--codeH1BgImage, url('/images/themes/h1bg-cyan.png'));
+@codeH2IconImage: var(--codeH2IconImage, url('/images/themes/h2icon-cyan.png'));
+@codeH3IconImage: var(--codeH3IconImage, url('/images/themes/h3icon-cyan.png'));
 
 
 
@@ -37,7 +43,8 @@
         font-size : 2rem;
         text-align: center;
         position  : relative;
-        width     : max-content;
+        width: max-content;
+        min-width: 6rem;
         margin    : 0 auto;
         z-index   : 0;
 
@@ -238,7 +245,7 @@
             content            : "";
             display            : inline-block;
             margin-right       : 8px;
-            margin-bottom      : -8px;
+            margin-bottom      : -6px;
             width              : 0;
             height             : 0;
             border             : 7px solid @colorPrimary;
@@ -263,13 +270,13 @@
     }
 
     pre {
-        font-family     : source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
-        overflow        : auto;
-        position        : relative;
-        box-shadow      : 0 0 8px rgba(110, 110, 110, 0.45);
-        border-radius   : 6px;
-        margin          : 1rem;
-        z-index         : 0;
+        font-family  : source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+        overflow     : auto;
+        position     : relative;
+        box-shadow   : 0 0 8px rgba(110, 110, 110, 0.45);
+        border-radius: 6px;
+        margin       : 1rem;
+        z-index      : 0;
 
         &::before {
             content            : "";
@@ -384,7 +391,7 @@
     }
 
     em {
-        color         : @colorPrimary;
+        color: @colorPrimary;
     }
 
     table {

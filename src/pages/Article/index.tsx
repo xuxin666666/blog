@@ -1,15 +1,13 @@
 import React from "react";
-import { Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import { FloatButton } from "antd";
 
 import Header from "@/components/Layout/Header";
 import ArticleList from "./ArticleList";
 import { ArticleDetail } from "./ArticleDetail";
 import { useUserStore } from "@/globalStore/user";
+import { ArticleStoreProvider } from "./store";
 // import styles from './less/index.module.less'
-import 'md-editor-rt/lib/style.css';
-import '@/styles/channing-cyan.less'
-
 
 
 
@@ -17,15 +15,18 @@ export const Article: React.FC = () => {
     const { isLogin } = useUserStore()
 
     return (
-        <div>
+        <ArticleStoreProvider>
             <Header items={[{ path: '/', text: 'hai' }]}>
-                {isLogin && (<span>写文章</span>)}
+                {isLogin && (<>
+                    <Link to='/article'>文章首页</Link>
+                    <Link to='/article/write'>写文章</Link>
+                </>)}
             </Header>
             <div>
                 <Outlet />
             </div>
             <FloatButton.BackTop />
-        </div>
+        </ArticleStoreProvider>
     )
 }
 

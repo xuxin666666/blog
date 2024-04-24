@@ -130,6 +130,7 @@
     max-height: 300px;
     overflow: auto;
     padding-right: 1rem;
+    color: gray;
 
     &::-webkit-scrollbar {
         width : 6px;
@@ -176,6 +177,7 @@
         padding: .3rem 0 .3rem 1.5rem;
         transition: all .3s ease-in-out;
         border-radius: 5px;
+        line-height: 1.4rem;
 
         &::after {
             content: '';
@@ -191,7 +193,7 @@
         }
 
         &:hover {
-            background-color: @colorPrimaryLighter;
+            background-color: @colorPrimary0;
         }
     }
 
@@ -211,6 +213,7 @@
 
     .active {
         color: @colorPrimary;
+        font-weight: 600;
 
         &::before {
             content: '';

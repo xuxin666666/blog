@@ -7,10 +7,12 @@ import { EyeOutlined, LikeOutlined, ClockCircleOutlined, LineChartOutlined, TagO
 import classnames from 'classnames'
 import dayjs from "dayjs"
 
-import { getArticleList, getArticleTags, getArticleStatistics } from "@/api/article"
+import { getArticleList, getArticleStatistics } from "@/api/article"
 import SearchBox from "@/components/SearchBox"
+import { useArticleStore } from "./store"
 import type { IGetArticleListReturn, IGetArticleListProps } from "@/api/article"
 import styles from './less/articleList.module.less'
+
 
 
 
@@ -19,22 +21,22 @@ const TagsCard: React.FC<{
 }> = ({ className }) => {
     const navigate = useNavigate()
 
-    const { data, loading } = useRequest(getArticleTags)
+    const { tags} = useArticleStore()
 
     const tagClick = (tagName: string) => {
-        if (window.location.pathname.includes('/articles/tag')) navigate(`/articles/tag/${tagName}`, { replace: true })
-        else navigate(`/articles/tag/${tagName}`)
+        if (window.location.pathname.includes('/article/tag')) navigate(`/article/tag/${tagName}`, { replace: true })
+        else navigate(`/article/tag/${tagName}`)
     }
 
-    if (loading || !data) return null
+    if (!tags.length) return null
     return (
         <div className={className}>
             <div className={styles.title}>
                 <TagOutlined className={styles.tag} />
-                标签({data.tags.length})
+                标签({tags.length})
             </div>
             <div className={styles.content}>
-                {data.tags.map(tag => (
+                {tags.map(tag => (
                     <Tag key={tag.tagName} onClick={() => tagClick(tag.tagName)}>
                         {tag.tagName} {tag.pageNum}
                     </Tag>
@@ -138,36 +140,36 @@ const ArticleList: React.FC = () => {
             <div className={styles['content-container']} ref={contentContainer}>
                 {/* 'rc-virtual-list方案，滚动不平滑 */}
                 {/* <VirtualList 
-                data={data.list} 
-                itemKey='id' 
-                onScroll={listScroll} 
-                itemHeight={140} 
-                className={classnames(styles['virtual-list'])} 
-                height={clientHeight} 
-                styles={{verticalScrollBarThumb: {backgroundColor: 'rgba(0, 0, 0, .35)'}}}
-            >
-                {(item: InferArray<IGetArticleListReturn['list']>) => (
-                    <div key={item.id} className={classnames(styles.item)}>
-                        <div className={classnames(styles['item-content'])}>
-                            <div className={classnames(styles.content)}>
-                                <div className={classnames(styles.title)}>{item.title}</div>
-                                <ClipText className={classnames(styles.text)} line={3}>
-                                    {item.content}
-                                </ClipText>
+                    data={data.list} 
+                    itemKey='id' 
+                    onScroll={listScroll} 
+                    itemHeight={140} 
+                    className={classnames(styles['virtual-list'])} 
+                    height={clientHeight} 
+                    styles={{verticalScrollBarThumb: {backgroundColor: 'rgba(0, 0, 0, .35)'}}}
+                >
+                    {(item: InferArray<IGetArticleListReturn['list']>) => (
+                        <div key={item.id} className={classnames(styles.item)}>
+                            <div className={classnames(styles['item-content'])}>
+                                <div className={classnames(styles.content)}>
+                                    <div className={classnames(styles.title)}>{item.title}</div>
+                                    <ClipText className={classnames(styles.text)} line={3}>
+                                        {item.content}
+                                    </ClipText>
+                                </div>
+                                <img src={item.image} alt={item.image} className={classnames(styles.img)} />
                             </div>
-                            <img src={item.image} alt={item.image} className={classnames(styles.img)} />
-                        </div>
-                        <div className={classnames(styles.actions)}>
-                            <div className={classnames(styles.left)}></div>
-                            <div className={classnames(styles.right)}>
-                                {item.tags.map(tag => (
-                                    <Tag key={tag}>{tag}</Tag>
-                                ))}
+                            <div className={classnames(styles.actions)}>
+                                <div className={classnames(styles.left)}></div>
+                                <div className={classnames(styles.right)}>
+                                    {item.tags.map(tag => (
+                                        <Tag key={tag}>{tag}</Tag>
+                                    ))}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                )}
-            </VirtualList> */}
+                    )}
+                </VirtualList> */}
 
                 {/* ahooks useVirtualList方案，滚动闪烁回退问题 */}
                 {/* <div ref={containerRef} className={classnames(styles['virtual-list'])} onScroll={listScroll} style={{ height: clientHeight + 'px' }}>
@@ -207,7 +209,7 @@ const ArticleList: React.FC = () => {
                     className={classnames(styles['virtual-list'])}
                 >
                     {data.list.map(item => (
-                        <Link key={item.id} className={classnames(styles.item)} to={`/articles/${item.id}`}>
+                        <Link key={item.id} className={classnames(styles.item)} to={`/article/${item.id}`}>
                             <div className={classnames(styles['item-content'])}>
                                 <div className={classnames(styles.content)}>
                                     <div className={classnames(styles.title)}>{item.title}</div>

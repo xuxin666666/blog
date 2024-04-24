@@ -1,7 +1,7 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import classnames from 'classnames'
 import { useEventListener } from "ahooks";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Modal, Space, message } from "antd";
 import { LogoutOutlined } from '@ant-design/icons'
 
@@ -10,7 +10,6 @@ import { useUserStore } from "@/globalStore/user";
 import OutLink from "@/components/OutLink";
 
 import style from './index.module.less'
-import { useHomePageListStore } from "@/globalStore/homePageList";
 
 
 
@@ -27,51 +26,51 @@ const Header: React.FC<{
     className?: string
 }> = ({ items = [], children, className }) => {
     const { isLogin, logout } = useUserStore()
-    const { list: homePageList } = useHomePageListStore()
-    const location = useLocation()
 
     const [navShow, setNavShow] = useState(true)
     const header = useRef<HTMLHeadElement>(null)
-    const touchDeltaY = useRef({ lastPos: 0, deltaY: 0 })
+    const prevTop = useRef(0)
 
-    useEventListener('wheel', event => {
-        event = event || window.event;
-        if (event.altKey || event.shiftKey || event.ctrlKey) return
-        setNavShow(event.deltaY < 0);
-    }, { target: document.body })
-
-    useEventListener('touchstart', event => {
-        touchDeltaY.current.lastPos = event.targetTouches[0].clientY
-        touchDeltaY.current.deltaY = 0
-    }, { target: document.body })
-
-    useEventListener('touchmove', event => {
-        if (event.targetTouches[0]) {
-            const clientY = event.targetTouches[0].clientY
-            let { lastPos, deltaY } = touchDeltaY.current
-            if ((clientY > lastPos && deltaY < 0) || (clientY < lastPos && deltaY > 0)) deltaY = 0
-
-            deltaY += clientY - lastPos
-            lastPos = clientY
-            if (Math.abs(deltaY) > 50) setNavShow(deltaY > 0)
-            touchDeltaY.current.lastPos = lastPos
-            touchDeltaY.current.deltaY = deltaY
-            // console.log(touchDeltaY.current)
+    // 用scroll实现功能，不用再多种判定了，滚不动的话，也确实没必要不展示
+    useEventListener('scroll', () => {
+        const newTop = document.documentElement.scrollTop
+        if(newTop > prevTop.current) {
+            setNavShow(false)
+        } else {
+            setNavShow(true)
         }
-    }, { target: document.body })
+        prevTop.current = newTop
+    })
 
-    useEffect(() => {
-        if(!header.current) return
+    //#region 
+    // const touchDeltaY = useRef({ lastPos: 0, deltaY: 0 })
 
-        let ans = '', primary = ''
-        for(const item of homePageList) {
-            if(location.pathname.startsWith(item.to) && item.to.length > ans.length) {
-                ans = item.to
-                if(item.primary) primary = item.primary
-            }
-        }
-        header.current.style.backgroundColor = primary ? primary + 'df' : '#043978'
-    }, [location.pathname, homePageList])
+    // useEventListener('wheel', event => {
+    //     event = event || window.event;
+    //     if (event.altKey || event.shiftKey || event.ctrlKey) return
+    //     setNavShow(event.deltaY < 0);
+    // }, { target: document.body })
+
+    // useEventListener('touchstart', event => {
+    //     touchDeltaY.current.lastPos = event.targetTouches[0].clientY
+    //     touchDeltaY.current.deltaY = 0
+    // }, { target: document.body })
+
+    // useEventListener('touchmove', event => {
+    //     if (event.targetTouches[0]) {
+    //         const clientY = event.targetTouches[0].clientY
+    //         let { lastPos, deltaY } = touchDeltaY.current
+    //         if ((clientY > lastPos && deltaY < 0) || (clientY < lastPos && deltaY > 0)) deltaY = 0
+
+    //         deltaY += clientY - lastPos
+    //         lastPos = clientY
+    //         if (Math.abs(deltaY) > 50) setNavShow(deltaY > 0)
+    //         touchDeltaY.current.lastPos = lastPos
+    //         touchDeltaY.current.deltaY = deltaY
+    //         // console.log(touchDeltaY.current)
+    //     }
+    // }, { target: document.body })
+    //#endregion
 
     const onLogout = () => {
         Modal.confirm({
@@ -87,7 +86,7 @@ const Header: React.FC<{
     }
 
     return (
-        <header className={classnames(className, style.header, { [style['hidden-header']]: !navShow })} ref={header}>
+        <header className={classnames(className, style.header, 'css-var-r0', { [style['hidden-header']]: !navShow })} ref={header}>
             <nav>
                 <Space direction='horizontal' size='middle'>
                     <Link to='/'>

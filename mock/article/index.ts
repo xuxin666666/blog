@@ -139,7 +139,7 @@ const routes: MockMethod[] = [
 
             let data = Mock.mock({
                 [`list|${pagesize}`]: [{
-                    title: '@ctitle(5, 15)',
+                    title: '@ctitle(10, 30)',
                     content: '@cparagraph',
                     'tags|1-3': ['@cword(2, 5)'],
                     image: '@image',
@@ -168,12 +168,14 @@ const routes: MockMethod[] = [
         method: 'get',
         statusCode: 200,
         response() {
-            return Mock.mock({
+            const tags = Mock.mock({
                 'tags|10-30': [{
                     tagName: '@cword(2, 5)',
-                    'pageNum|5-30': 0
+                    'pageNum|5-30': 0,
+                    color: '@color'
                 }]
             })
+            return tags.tags
         }
     },
     {
@@ -211,11 +213,29 @@ const routes: MockMethod[] = [
         }
     },
     {
-        url: '/api/article/:id',
+        url: '/api/article/:id/like',
         method: 'post',
         response({body: {like = false}}) {
             return
         },
+    },
+    {
+        url: '/api/article/tags',
+        method: 'post',
+        statusCode: 200,
+        response({body: {tags}}) {
+            return
+        }
+    },
+    {
+        url: '/api/article',
+        method: 'post',
+        statusCode: 200,
+        response({body: {id, title, content, abstract, tags, imgs}}) {
+            // console.log(imgs, tags)
+            if(!id) id = Mock.Random.guid()
+            return id
+        }
     }
 ]
 

@@ -1,7 +1,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { toHexString } from "../parseColor";
+import Color from 'color'
 
 
 
@@ -431,6 +431,6 @@ const IC = new ImageColor()
 export const getPrimaryColor = (url: string) => new Promise<string>((resolve) => {
     IC.analizeImage({ url, id: 'id', frequency: 10 }).then(res => {
         const [r, g, b] = (res as any).primary
-        resolve(toHexString({ r, g, b }))
+        resolve(Color.rgb(r, g, b).hex())
     })
 })

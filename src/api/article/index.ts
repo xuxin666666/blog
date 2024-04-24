@@ -1,3 +1,4 @@
+// import axios from "axios"
 import { defaultServer } from "../config"
 
 
@@ -26,14 +27,16 @@ export const getArticleList = (props: IGetArticleListProps) => defaultServer.get
 
 
 
-export interface IGetArticleTagsReturn {
-    tags: {
-        tagName: string
-        pageNum: number
-    }[]
+export interface ITag {
+    tagName: string
+    color: string
 }
-export const getArticleTags = () => defaultServer.get('/article/tags').then<IGetArticleTagsReturn>(res => res.data)
+export interface IArticleTag extends ITag {
+    pageNum: number
+}
+export const getArticleTags = () => defaultServer.get('/article/tags').then<IArticleTag[]>(res => res.data)
 
+export const createArticleTags = (tags: ITag[]) => defaultServer.post('/article/tags', {tags}).then<void>(res => res.data)
 
 
 export interface IGetArticleStatisticsReturn {
@@ -61,4 +64,29 @@ export const getArticleDetail = (id: string) => defaultServer.get(`/article/${id
 
 
 
-export const setArticleLike = (id: string, like = false) => defaultServer.post(`/article/${id}`, {like}).then<void>(res => res.data)
+export const setArticleLike = (id: string, like = false) => defaultServer.post(`/article/${id}/like`, { like }).then<void>(res => res.data)
+
+
+
+interface IPublishArticleProps {
+    id?: string
+    title: string
+    content: string
+    abstract: string
+    tags: string[]
+    imgs?: {name: string, data: File}[]
+}
+export const publishArticle = (props: IPublishArticleProps) => {
+    const form = new FormData()
+    // let key: keyof IPublishArticleProps
+    for(const [key, val] of Object.entries(props)) {
+        if(key === 'imgs') {
+            for(const img of val) {
+                form.append(key, img.data, img.name)
+            }
+        }
+        else form.append(key, val)
+    }
+    return defaultServer.post('/article', form).then<string>(res => res.data)
+    // return axios.post('http://localhost:3003/article', form).then<string>(res => res.data)
+}

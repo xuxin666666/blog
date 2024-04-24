@@ -21,7 +21,7 @@ export interface IChangePasswordProps {
 async function encPwd(obj: Record<string, any>, ...keys: string[]) {
     if(keys.length === 0) keys.push('password')
 
-    for(const key of keys) if(Object.hasOwn(obj, key)) obj[key] = await SHA256(obj[key])
+    for(const key of keys) if(Object.hasOwn(obj, key)) obj[key] = SHA256(obj[key])
     return obj
 }
 
