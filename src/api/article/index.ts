@@ -74,9 +74,10 @@ interface IPublishArticleProps {
     content: string
     abstract: string
     tags: string[]
+    words: number
     imgs?: {name: string, data: File}[]
 }
-export const publishArticle = (props: IPublishArticleProps) => {
+export const publishArticle = async (props: IPublishArticleProps) => {
     const form = new FormData()
     // let key: keyof IPublishArticleProps
     for(const [key, val] of Object.entries(props)) {
@@ -87,6 +88,8 @@ export const publishArticle = (props: IPublishArticleProps) => {
         }
         else form.append(key, val)
     }
-    return defaultServer.post('/article', form).then<string>(res => res.data)
-    // return axios.post('http://localhost:3003/article', form).then<string>(res => res.data)
+    const res = await defaultServer.post('/article', form)
+    // const res = await axios.post('http://localhost:8000/article', form)
+    const result: string = res.data
+    return result
 }

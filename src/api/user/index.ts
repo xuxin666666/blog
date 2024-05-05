@@ -1,5 +1,5 @@
 import store from "store"
-import { defaultServer } from "../config"
+import { defaultServer, defaultSetToken, reLoginServer, reLoginSetToken } from "../config"
 import { SHA256 } from "@/utils/crypto"
 
 
@@ -7,6 +7,12 @@ import { SHA256 } from "@/utils/crypto"
 export interface ILoginProps {
     email: string
     password: string
+}
+
+export interface ILoginReturns {
+    username: string
+    email: string
+    headPic: string
 }
 
 export interface IChangePasswordProps {
@@ -26,12 +32,21 @@ async function encPwd(obj: Record<string, any>, ...keys: string[]) {
 }
 
 
-export const autoLogin = () => defaultServer.get('user/auto').then<object>(res => res.data || {})
+export const autoLogin = () => reLoginServer.get('user/auto').then<ILoginReturns>(res => {
+    const accessToken = res.data.accessToken
+    store.set('accessToken', accessToken)
+    defaultSetToken(accessToken)
+    return res.data.userInfo
+})
 
-export const login = (props: ILoginProps) => encPwd(props).then(props => defaultServer.post('user', props).then<object>(res => {
-    const token = res.data.token
-    store.set('token', token)
-    return res.data.data || {}
+export const login = (props: ILoginProps) => encPwd(props).then(props => defaultServer.post('user', props).then<ILoginReturns>(res => {
+    const refreshToken = res.data.refreshToken
+    const accessToken = res.data.accessToken
+    store.set('refreshToken', refreshToken)
+    store.set('accessToken', accessToken)
+    reLoginSetToken(refreshToken)
+    defaultSetToken(accessToken)
+    return res.data.userInfo
 }))
 
 export const changePassword = (props: IChangePasswordProps) => encPwd(props, 'newPassword', 'oldPassword').then(props => defaultServer.post('user/changePassword', props)).then<void>(res => res.data)

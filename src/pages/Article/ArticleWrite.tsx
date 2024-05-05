@@ -73,7 +73,7 @@ const prefix = '_article_'
 // 匹配图片链接：![xxx](__imgs_xxx "xxx")，第一个匹配项是图片链接中的地址
 const reg1 = /!\[.*?\]\((__imgs_[^ ()'"]*).*?\)/g
 // 匹配图片链接：<!-- xxx -->\n![xxx](blob:xxx "xxx")，第一个匹配项是注释中的内容，第二个是图片链接中的地址
-const reg2 = /<!-- (.*?) -->\n!\[.*?\]\((blob:[^ ()'"]*).*?\)/g
+const reg2 = /<!-- (.*?) -->\r?\n!\[.*?\]\((blob:[^ ()'"]*).*?\)/g
 
 const generateDraftID = () => prefix + generateUUID()
 const getDrafts = () => store.filter<IArticleStoreContent>(key => key.startsWith(prefix)).sort((a, b) => b.val.timestamp - a.val.timestamp)
@@ -214,7 +214,7 @@ const PublishBox: React.FC<{
     return (
         <>
             <Modal open={open} onCancel={close} closable={false} okText='发布' className={styles.modal} onOk={() => form.submit()}>
-                <Form form={form} initialValues={{ tags: [], abstract: textContent }} onFinish={onFinish}>
+                <Form form={form} initialValues={{ tags: [], abstract: textContent.slice(0, 500) }} onFinish={onFinish}>
                     <Form.Item label='标签' required>
                         <Form.Item name='tags' rules={[{ required: true, type: 'array', message: '至少一个标签' }]} noStyle>
                             <Select
@@ -233,7 +233,7 @@ const PublishBox: React.FC<{
                         没有想要的标签？<Button type='link' style={{ padding: 0 }} onClick={() => setCreateTagVis(true)}>点此创建</Button>
                     </Form.Item>
                     <Form.Item label='摘要' name='abstract' rules={[{ required: true, message: '内容不能为空' }]}>
-                        <Input.TextArea />
+                        <Input.TextArea showCount maxLength={500} />
                     </Form.Item>
                 </Form>
             </Modal>
@@ -388,6 +388,7 @@ const ArticleWrite: React.FC = () => {
             abstract, 
             title, 
             content: value, 
+            words: textContentWithoutBlank.length,
             imgs: objectUrls.current.map(item => ({name: item.name, data: item.data}))
         }).then(async (newPageId) => {
             // 删除数据库缓存的图片

@@ -231,7 +231,7 @@ const routes: MockMethod[] = [
         url: '/api/article',
         method: 'post',
         statusCode: 200,
-        response({body: {id, title, content, abstract, tags, imgs}}) {
+        response({body: {id, title, content, abstract, tags, imgs, words}}) {
             // console.log(imgs, tags)
             if(!id) id = Mock.Random.guid()
             return id
