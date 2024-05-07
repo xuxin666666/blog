@@ -24,3 +24,5 @@ declare module 'store' {
 
 
 type InferArray<T> = T extends (infer S)[] ? S : never
+type ValueOf<T> = T extends {[K in keyof T]: T[K]} ? T[K] : never
+type PromiseType<T> = T extends Promise<infer S> ? S: never

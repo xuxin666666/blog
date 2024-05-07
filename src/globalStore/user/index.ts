@@ -9,7 +9,7 @@ import type { ILoginProps } from '@/api/user'
 
 // 用户登录，目前设计就我一个用户，其他皆为游客，因此不需要过多内容
 export const [useUserStore, getUserStore] = createGlobalStore(() => {
-    const [isLogin, setIsLogin] = useState(true)
+    const [isLogin, setIsLogin] = useState(false)
 
     const { data, mutate } = useRequest(autoLogin)
     const { runAsync: mLogin, loading: loginLoading } = useRequest(login, { manual: true })
@@ -21,7 +21,8 @@ export const [useUserStore, getUserStore] = createGlobalStore(() => {
 
     const logout = () => {
         mutate(undefined)
-        store.remove('token')
+        store.remove('refreshToken')
+        store.remove('accessToken')
     }
 
     const cLogin = async (props: ILoginProps) => {

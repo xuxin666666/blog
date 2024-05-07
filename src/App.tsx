@@ -46,10 +46,10 @@ function App() {
         <ConfigProvider theme={theme} locale={zhCN}>
             <AntdApp>
                 <Outlet />
+                <Modal open={loginModalVis} onCancel={() => setLoginModalVis(false)} footer={false} closable={false}>
+                    <Login callback={() => setLoginModalVis(false)} />
+                </Modal>
             </AntdApp>
-            <Modal open={loginModalVis} onCancel={() => setLoginModalVis(false)} footer={false} closable={false}>
-                <Login callback={() => setLoginModalVis(false)} />
-            </Modal>
             {createPortal(
                 <FlyingFish className={classnames(styles.fish, { [styles['fish-hid']]: !loginModalVis })} />,
                 document.body

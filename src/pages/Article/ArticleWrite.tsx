@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useDebounceFn } from "ahooks";
+import { useDebounceFn, useMemoizedFn } from "ahooks";
 import { MdEditor, ExposeParam, ToolbarNames, UploadImgEvent, SaveEvent } from "md-editor-rt";
 import { Modal, App, List, Popconfirm, Input, Button, Space, Select, Form, ColorPicker } from "antd";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { DeleteOutlined, EditOutlined, DownOutlined } from "@ant-design/icons";
 import store from "store";
 import dayjs from "dayjs";
@@ -10,8 +10,8 @@ import classnames from 'classnames'
 import type { Color } from 'antd/lib/color-picker'
 
 import { db } from "./db";
-import { useArticleStore } from "./store";
-import { publishArticle } from "@/api/article";
+import { useArticleStore, useTagStore } from "./store";
+import { getArticleDetail, publishArticle } from "@/api/article";
 import { generateUUID } from "@/utils/crypto";
 import { useReboundState } from "@/hooks";
 import styles from './less/articleWrite.module.less'
@@ -20,10 +20,14 @@ import '@/styles/channing-cyan.less'
 
 
 
+
 interface IArticleStoreContent {
     title: string
     content: string
     timestamp: number
+    tags: string[]
+    articleID: string
+    abstract: string
 }
 
 interface IArticleStore {
@@ -34,6 +38,11 @@ interface IArticleStore {
 interface IPublishForm {
     tags: string[]
     abstract: string
+}
+
+// 新文章的默认内容，空的
+const defaultContent: IArticleStoreContent = {
+    timestamp: 0, title: '', tags: [], abstract: '', articleID: '', content: ''
 }
 
 
@@ -70,6 +79,8 @@ const toolbars: ToolbarNames[] = [
     'github'
 ];
 const prefix = '_article_'
+// 上传图片最大5MB
+const maxImgSize = 1024 * 1024 * 5
 // 匹配图片链接：![xxx](__imgs_xxx "xxx")，第一个匹配项是图片链接中的地址
 const reg1 = /!\[.*?\]\((__imgs_[^ ()'"]*).*?\)/g
 // 匹配图片链接：<!-- xxx -->\n![xxx](blob:xxx "xxx")，第一个匹配项是注释中的内容，第二个是图片链接中的地址
@@ -102,7 +113,11 @@ const DraftBox: React.FC<{
 
     return (
         <Modal open={open} onCancel={close} closable={false} footer={false} className={styles.modal}>
-            <Button onClick={() => onSelect({ key: generateDraftID(), val: { title: '', timestamp: 0, content: '' } })} className={styles.button} type='primary'>
+            <Button
+                onClick={() => onSelect({ key: generateDraftID(), val: defaultContent })}
+                className={styles.button}
+                type='primary'
+            >
                 写新文章
             </Button>
             <List
@@ -134,16 +149,16 @@ const CreateTagBox: React.FC<{
     close: () => void
     onCreate: () => void
 }> = ({ open, close, onCreate }) => {
-    const [form] = Form.useForm<{ tagName: string, color: Color}>()
-    const {addTags, hasTag} = useArticleStore()
+    const [form] = Form.useForm<{ tagName: string, color: Color }>()
+    const { addTag, hasTag } = useTagStore(data => [data.addTag, data.hasTag])
 
     useEffect(() => {
         if (open) form.resetFields()
     }, [open, form])
 
-    const onFinish = ({tagName, color}: { tagName: string, color: Color | string}) => {
-        if(typeof color !== 'string') color = color.toHexString()
-        addTags([{tagName, color}]).then(() => {
+    const onFinish = ({ tagName, color }: { tagName: string, color: Color | string }) => {
+        if (typeof color !== 'string') color = color.toHexString()
+        addTag({ tagName, color }).then(() => {
             onCreate()
         })
     }
@@ -154,19 +169,23 @@ const CreateTagBox: React.FC<{
                 <Form.Item name='tagName' label='标签名称' tooltip='中文占2字，不要输入emoji'
                     rules={[
                         { required: true, message: '请输入标签名称' },
-                        { validator(_rule, value: string) {
-                            let len = 0
-                            for(const c of value) {
-                                if(c.match(/[\u4e00-\u9fcb]/)) len += 2
-                                else len++
+                        {
+                            validator(_rule, value: string) {
+                                let len = 0
+                                for (const c of value) {
+                                    if (c.match(/[\u4e00-\u9fcb]/)) len += 2
+                                    else len++
+                                }
+                                if (len > 12) return Promise.reject('标签名称应12字以内')
+                                return Promise.resolve()
                             }
-                            if(len > 12) return Promise.reject('标签名称应12字以内')
-                            return Promise.resolve()
-                        }},
-                        {validator(_rule, value) {
-                            if(hasTag(value)) return Promise.reject('已存在该标签')
-                            return Promise.resolve()
-                        }}
+                        },
+                        {
+                            validator(_rule, value) {
+                                if (hasTag(value)) return Promise.reject('已存在该标签')
+                                return Promise.resolve()
+                            }
+                        }
                     ]}
                 >
                     <Input placeholder="请输入标签名称，1-12字" />
@@ -184,7 +203,9 @@ const PublishBox: React.FC<{
     close: () => void
     onPublish: (tags: string[], abstract: string) => void
     textContent?: string
-}> = ({ open, close, onPublish, textContent = '' }) => {
+    abstractContent?: string
+    tags?: string[]
+}> = ({ open, close, onPublish, textContent = '', abstractContent = '', tags: initTags = [] }) => {
     const [createTagVis, setCreateTagVis] = useState(false)
 
     const [form] = Form.useForm<IPublishForm>()
@@ -194,7 +215,7 @@ const PublishBox: React.FC<{
         if (open) form.resetFields()
     }, [open, form])
 
-    const { tags: allTags } = useArticleStore()
+    const { data: allTags } = useTagStore()
 
     const options = useMemo(() => {
         return allTags.map(tag => ({
@@ -214,7 +235,7 @@ const PublishBox: React.FC<{
     return (
         <>
             <Modal open={open} onCancel={close} closable={false} okText='发布' className={styles.modal} onOk={() => form.submit()}>
-                <Form form={form} initialValues={{ tags: [], abstract: textContent.slice(0, 500) }} onFinish={onFinish}>
+                <Form form={form} initialValues={{ tags: initTags, abstract: abstractContent || textContent.slice(0, 500) }} onFinish={onFinish}>
                     <Form.Item label='标签' required>
                         <Form.Item name='tags' rules={[{ required: true, type: 'array', message: '至少一个标签' }]} noStyle>
                             <Select
@@ -233,7 +254,7 @@ const PublishBox: React.FC<{
                         没有想要的标签？<Button type='link' style={{ padding: 0 }} onClick={() => setCreateTagVis(true)}>点此创建</Button>
                     </Form.Item>
                     <Form.Item label='摘要' name='abstract' rules={[{ required: true, message: '内容不能为空' }]}>
-                        <Input.TextArea showCount maxLength={500} />
+                        <Input.TextArea showCount maxLength={500} rows={5} />
                     </Form.Item>
                 </Form>
             </Modal>
@@ -243,8 +264,14 @@ const PublishBox: React.FC<{
 }
 
 const ArticleWrite: React.FC = () => {
+    const param = useParams()
+    const {refreshForceAll} = useArticleStore((data) => [data.refreshForceAll])
+
+    const [articleID, setArticleID] = useState(param.id || '')
     const [title, setTitle] = useState('')
     const [value, setValue] = useState('')
+    const [tags, setTags] = useState<string[]>([])
+    const [abstractContent, setAbstractContent] = useState('')
     const [textContent, setTextContent] = useState('')
     const [saveTextVis, setSaveTextVis] = useReboundState(false, 2000)
     const [draftBoxVis, setDraftBoxVis] = useState(false)
@@ -261,6 +288,42 @@ const ArticleWrite: React.FC = () => {
     const { message } = App.useApp()
     const navigate = useNavigate()
 
+    const getPublished = useMemoizedFn(() => {
+        // 设置为-1，因为替换内容时也会改变一次
+        changed.current.content = -1
+        // input手动设置值时不会触发onChange
+        changed.current.title = 0
+
+        const articles = store.filter<IArticleStoreContent>((_key, val) => val.articleID === articleID)
+        if (articles.length) {
+            const article = articles[0].val
+            setTitle(article.title)
+            setTags(article.tags)
+            setValue(article.content)
+            setAbstractContent(article.abstract)
+            message.info('已加载之前草稿的内容')
+        } else {
+            getArticleDetail(articleID).then(data => {
+                setTitle(data.title)
+                setTags(data.tags)
+                setValue(data.content)
+                setAbstractContent(data.abstract)
+            }).catch(() => {
+                message.error('获取文章内容失败')
+                navigate('/article/write', { replace: true })
+            })
+        }
+    })
+
+    // 有articleID代表是更新内容，根据param.id判断是从草稿中加载还是直接请求
+    useEffect(() => {
+        const articleID = param.id
+
+        if (articleID) {
+            getPublished()
+        }
+    }, [param.id, getPublished])
+
     const textContentWithoutBlank = useMemo(() => {
         return textContent.replace(/[ \n]+/g, '')
     }, [textContent])
@@ -274,11 +337,15 @@ const ArticleWrite: React.FC = () => {
         if (!title && !val) return
         if (changed.current.content < 1 && changed.current.title < 1) return
 
-        store.set(id.current, {
+        const data: IArticleStoreContent = {
             title: title,
             timestamp: Date.now(),
-            content: val
-        })
+            content: val,
+            articleID,
+            abstract: abstractContent,
+            tags
+        }
+        store.set(id.current, data)
         setSaveTextVis(true)
     }
 
@@ -350,6 +417,13 @@ const ArticleWrite: React.FC = () => {
     }
 
     const uploadImg: UploadImgEvent = async (files, callback) => {
+        for(const file of files) {
+            if(file.size > maxImgSize) {
+                message.error('图片最大5MB')
+                return
+            }
+        }
+
         const names = await db.addImgs(files, id.current)
         shouldReplaceImgs.current = true
         callback(names)
@@ -360,7 +434,7 @@ const ArticleWrite: React.FC = () => {
         setDraftBoxVis(true)
     }
 
-    const onSelect = async (data: IArticleStore) => {
+    const onDraftSelect = async (data: IArticleStore) => {
         // 设置文章id
         id.current = data.key
         // 清空图片缓存，毕竟后面用不到了
@@ -372,6 +446,9 @@ const ArticleWrite: React.FC = () => {
         changed.current.title = 0
 
         setTitle(data.val.title)
+        setTags(data.val.tags)
+        setAbstractContent(data.val.abstract)
+        setArticleID(data.val.articleID)
         const content = await replaceOldImgs(data.val.content)
         setValue(content)
         setDraftBoxVis(false)
@@ -379,26 +456,29 @@ const ArticleWrite: React.FC = () => {
     }
 
     const publish = (tags: string[], abstract: string) => {
-        if(!title || !value) {
+        if (!title || !value) {
             setPublishBox(false)
             return message.warning('请先完成文章内容')
         }
         publishArticle({
-            tags, 
-            abstract, 
-            title, 
-            content: value, 
+            id: articleID,
+            tags,
+            abstract,
+            title,
+            content: value,
             words: textContentWithoutBlank.length,
-            imgs: objectUrls.current.map(item => ({name: item.name, data: item.data}))
+            imgs: objectUrls.current.map(item => ({ name: item.name, data: item.data }))
         }).then(async (newPageId) => {
             // 删除数据库缓存的图片
-            await db.deleteImgs({articleID: id.current})
+            await db.deleteImgs({ articleID: id.current })
             // 删除浏览器缓存的blob图片
             objectUrls.current.forEach(item => URL.revokeObjectURL(item.url))
-            // 清除该草稿
+            // 删除该草稿
             store.remove(id.current)
+            // 清空文章列表数据的缓存，使得下次能发送请求获取新数据
+            refreshForceAll()
             // 跳转新页面
-            navigate(`/article/${newPageId}`, {replace: true})
+            navigate(`/article/${newPageId}`, { replace: true })
         })
     }
 
@@ -412,7 +492,9 @@ const ArticleWrite: React.FC = () => {
                     </span>
                     <Button type='primary' onClick={openDraftBox}>草稿箱</Button>
                     <Button type='primary' onClick={() => editorRef.current?.triggerSave()}>保存</Button>
-                    <Button type='primary' onClick={() => setPublishBox(true)}>发布</Button>
+                    <Button type='primary' onClick={() => setPublishBox(true)}>
+                        {articleID ? '更新' : '发布'}
+                    </Button>
                 </Space>
             </div>
             <MdEditor
@@ -437,8 +519,15 @@ const ArticleWrite: React.FC = () => {
                 ]}
                 footers={['markdownTotal', 0, '=', 'scrollSwitch']}
             />
-            <DraftBox open={draftBoxVis} close={() => setDraftBoxVis(false)} onSelect={onSelect} />
-            <PublishBox open={publishBox} close={() => setPublishBox(false)} textContent={textContent} onPublish={publish} />
+            <DraftBox open={draftBoxVis} close={() => setDraftBoxVis(false)} onSelect={onDraftSelect} />
+            <PublishBox
+                open={publishBox}
+                close={() => setPublishBox(false)}
+                textContent={textContent}
+                abstractContent={abstractContent}
+                tags={tags}
+                onPublish={publish}
+            />
         </div>
     )
 }

@@ -1,5 +1,5 @@
 import React from "react"
-import { Form, Input, Button, message } from "antd"
+import { Form, Input, Button, App } from "antd"
 import { LockOutlined } from "@ant-design/icons"
 import { EmailOutlined } from "@/components/Icons";
 import { useUserStore } from "@/globalStore/user";
@@ -11,17 +11,20 @@ const useForm = Form.useForm
 
 const Login: React.FC<{
     callback?: () => void
-}> = ({callback}) => {
+}> = ({ callback }) => {
+    const { message } = App.useApp()
+
     const [form] = useForm()
-    const {login, loginLoading} = useUserStore()
+    const { login, loginLoading } = useUserStore()
 
     const onFinish = (val: any) => {
         login(val).then(() => {
             callback?.()
             message.success('登录成功')
         }).catch((err) => {
-            message.error('登录失败' + err)
             console.log(err)
+            message.error('登录失败' + err)
+            // console.log(err)
         })
     }
 
@@ -33,7 +36,7 @@ const Login: React.FC<{
                     [item]: ''
                 })
             })
-            
+
         })
         const input = form.getFieldInstance(fields[0].name)
         input.focus()

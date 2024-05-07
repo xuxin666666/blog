@@ -32,14 +32,14 @@ async function encPwd(obj: Record<string, any>, ...keys: string[]) {
 }
 
 
-export const autoLogin = () => reLoginServer.get('user/auto').then<ILoginReturns>(res => {
+export const autoLogin = () => reLoginServer.post('user/auto').then<ILoginReturns>(res => {
     const accessToken = res.data.accessToken
     store.set('accessToken', accessToken)
     defaultSetToken(accessToken)
     return res.data.userInfo
 })
 
-export const login = (props: ILoginProps) => encPwd(props).then(props => defaultServer.post('user', props).then<ILoginReturns>(res => {
+export const login = (props: ILoginProps) => encPwd(props).then(props => defaultServer.post('user/login', props).then<ILoginReturns>(res => {
     const refreshToken = res.data.refreshToken
     const accessToken = res.data.accessToken
     store.set('refreshToken', refreshToken)

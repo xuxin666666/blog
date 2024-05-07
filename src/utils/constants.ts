@@ -12,8 +12,9 @@ import type { IHeaderTitles } from "@/components/Layout/Header"
 
 export const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-export const baseURL = "/api"
-export const imageUrl = "/api/static/"
+// export const baseURL = "/api"
+export const baseURL = "http://localhost:8000"
+export const imageUrl = "http://localhost:8000"
 export const ioUrl = "/api"
 
 

@@ -1,18 +1,21 @@
 import React, { useState } from "react";
-import { useLoaderData } from "react-router-dom";
+import { Link, useLoaderData, useNavigate } from "react-router-dom";
 import { MdPreview, HeadList, MdHeadingId } from 'md-editor-rt'
-import { Tag, Drawer } from "antd";
-import store from "store";
-import { useMount, useUnmount, useRequest } from "ahooks";
-import { EyeOutlined, ClockCircleOutlined, MenuFoldOutlined } from "@ant-design/icons";
+import { Tag, Drawer, Space, App } from "antd";
+import { EyeOutlined, ClockCircleOutlined, MenuFoldOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
+import classnames from 'classnames'
 
 import { UpdateTimeOutlined, WordCountOutlined } from "@/components/Icons";
 import Catalog from "@/components/Catalog";
-import { IGetArticleDetailReturn, setArticleLike } from "@/api/article";
+import { IGetArticleDetailReturn } from "@/api/article";
+import { useUserStore } from "@/globalStore/user";
+import { useArticleStore, useThumpupStore } from "./store";
 import styles from './less/articleDetail.module.less'
 import 'md-editor-rt/lib/preview.css';
 import '@/styles/channing-cyan.less'
+
+
 
 
 
@@ -25,29 +28,17 @@ const ThumbUp: React.FC<{
     likes: number
     id: string
 }> = ({ likes, id }) => {
-    const [liked, setLiked] = useState(false)
-    const { run } = useRequest(setArticleLike, { debounceWait: 3000, manual: true })
+    const { isThumpuped, toggleThumpup } = useThumpupStore()
+    const [liked, setLiked] = useState(() => isThumpuped(id))
 
-    const click = (e: React.MouseEvent) => {
-        const res = !liked
-        if (res) e.currentTarget.parentElement?.classList.add(styles.active)
-        else e.currentTarget.parentElement?.classList.remove(styles.active)
-
-        setLiked(res)
-        run(id, res)
+    const click = () => {
+        toggleThumpup(id)
+        setLiked(!liked)
     }
-
-    useMount(() => {
-        setLiked(store.get(id, false))
-    })
-
-    useUnmount(() => {
-        store.set(id, liked)
-    })
 
     return (
         <div className={styles['like-container']}>
-            <div className={styles.like}>
+            <div className={classnames(styles.like, { [styles.active]: liked })}>
                 <div onClick={click}></div>
             </div>
             <span>{likes + (liked ? 1 : 0)}</span>
@@ -57,15 +48,39 @@ const ThumbUp: React.FC<{
 
 export const ArticleDetail: React.FC = () => {
     const data = useLoaderData() as IGetArticleDetailReturn
+    const { modal, message } = App.useApp()
+    const navigate = useNavigate()
+
+    const { isLogin } = useUserStore()
+    const { deleteArticle } = useArticleStore(data => [data.deleteArticle])
 
     const [catalog, setCatalog] = useState<HeadList[]>([])
     const [open, setOpen] = useState(false)
+
+    const onDelete = () => {
+        modal.confirm({
+            title: '确定删除该文章？',
+            onOk: async () => {
+                await deleteArticle(data.id)
+                message.success('成功删除，可在管理页找回')
+                navigate('/article', { replace: true })
+            }
+        })
+    }
 
     return (
         <>
             <div className={styles.container}>
                 <div className={styles.content}>
-                    <h1>{data.title}</h1>
+                    <div className={styles.head}>
+                        <h1>{data.title}</h1>
+                        {isLogin && (<Space size='large'>
+                            <Link to={`/article/write/${data.id}`}>
+                                <EditOutlined className={styles.edit} />
+                            </Link>
+                            <DeleteOutlined className={styles.delete} onClick={onDelete} />
+                        </Space>)}
+                    </div>
                     <div className={styles.tags}>
                         {data.tags.map(item => (<Tag key={item}>{item}</Tag>))}
                     </div>
@@ -83,12 +98,16 @@ export const ArticleDetail: React.FC = () => {
                             {dayjs(data.createTime).format('YYYY-MM-DD')}
                         </div>
                     </div>
-                    {!!data.updateTime && (<div className={styles.actions}>
-                        <div>
-                            <UpdateTimeOutlined />
-                            更新于 {dayjs(data.updateTime).format('YYYY-MM-DD')}
-                        </div>
-                    </div>)}
+                    {
+                        !!data.updateTime
+                        && (Math.abs(data.updateTime - data.createTime)) > 5000
+                        && (<div className={styles.actions}>
+                            <div>
+                                <UpdateTimeOutlined />
+                                更新于 {dayjs(data.updateTime).format('YYYY-MM-DD')}
+                            </div>
+                        </div>)
+                    }
                     <MdPreview
                         modelValue={data.content}
                         previewTheme="channing-cyan"
@@ -104,21 +123,25 @@ export const ArticleDetail: React.FC = () => {
                 </div>
                 <div className={styles.slider}>
                     <div>
-                        <div className={styles['menu-container']}>
-                            <div className={styles.title}>目录</div>
-                            <Catalog
-                                catalog={catalog}
-                                activeItemClassName={styles.active}
-                                itemClassName={styles['menu-item']}
-                                className={styles.menu}
-                                checkPos={200}
-                            />
-                        </div>
+                        {!!catalog.length && (
+                            <div className={styles['menu-container']}>
+                                <div className={styles.title}>目录</div>
+                                <Catalog
+                                    catalog={catalog}
+                                    activeItemClassName={styles.active}
+                                    itemClassName={styles['menu-item']}
+                                    className={styles.menu}
+                                    checkPos={200}
+                                />
+                            </div>
+                        )}
                     </div>
                 </div>
-                <div className={styles['mobile-menu']} onClick={() => setOpen(true)}>
-                    <MenuFoldOutlined className={styles.button} />
-                </div>
+                {!!catalog.length && (
+                    <div className={styles['mobile-menu']} onClick={() => setOpen(true)}>
+                        <MenuFoldOutlined className={styles.button} />
+                    </div>
+                )}
             </div>
             <Drawer onClose={() => setOpen(false)} open={open} closable={false} width={250}>
                 <div className={styles['menu-container']}>

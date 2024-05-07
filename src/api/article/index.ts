@@ -4,9 +4,9 @@ import { defaultServer } from "../config"
 
 
 export interface IGetArticleListProps {
-    pageSize: number
+    pagesize: number
     page: number
-    tags?: string[]
+    tags: string[]
     q: string
 }
 export interface IGetArticleListReturn {
@@ -23,9 +23,6 @@ export interface IGetArticleListReturn {
     }[],
     total: number
 }
-export const getArticleList = (props: IGetArticleListProps) => defaultServer.get('/article/list', { params: props }).then<IGetArticleListReturn>(res => res.data)
-
-
 
 export interface ITag {
     tagName: string
@@ -34,10 +31,6 @@ export interface ITag {
 export interface IArticleTag extends ITag {
     pageNum: number
 }
-export const getArticleTags = () => defaultServer.get('/article/tags').then<IArticleTag[]>(res => res.data)
-
-export const createArticleTags = (tags: ITag[]) => defaultServer.post('/article/tags', {tags}).then<void>(res => res.data)
-
 
 export interface IGetArticleStatisticsReturn {
     views: number
@@ -45,9 +38,6 @@ export interface IGetArticleStatisticsReturn {
     pages: number
     likes: number
 }
-export const getArticleStatistics = () => defaultServer.get('/article/statistics').then<IGetArticleStatisticsReturn>(res => res.data)
-
-
 
 export interface IGetArticleDetailReturn {
     id: string,
@@ -56,19 +46,13 @@ export interface IGetArticleDetailReturn {
     tags: string[]
     views: number
     likes: number
+    abstract: string
     createTime: number
     updateTime?: number
     words: number
 }
-export const getArticleDetail = (id: string) => defaultServer.get(`/article/${id}`).then<IGetArticleDetailReturn>(res => res.data)
 
-
-
-export const setArticleLike = (id: string, like = false) => defaultServer.post(`/article/${id}/like`, { like }).then<void>(res => res.data)
-
-
-
-interface IPublishArticleProps {
+export interface IPublishArticleProps {
     id?: string
     title: string
     content: string
@@ -77,6 +61,21 @@ interface IPublishArticleProps {
     words: number
     imgs?: {name: string, data: File}[]
 }
+
+
+
+export const getArticleList = (props: IGetArticleListProps) => defaultServer.get('/article/list', { params: props }).then<IGetArticleListReturn>(res => res.data)
+
+export const getArticleTags = () => defaultServer.get('/article/tags').then<IArticleTag[]>(res => res.data.list)
+
+export const createArticleTag = (tag: ITag) => defaultServer.post('/article/tags', tag).then<void>(res => res.data)
+
+export const getArticleStatistics = () => defaultServer.get('/article/statistics').then<IGetArticleStatisticsReturn>(res => res.data)
+
+export const getArticleDetail = (id: string) => defaultServer.get(`/article/${id}`).then<IGetArticleDetailReturn>(res => res.data)
+
+export const setArticleLike = (id: string, like = false) => defaultServer.post(`/article/${id}/like`, { like }).then<void>(res => res.data)
+
 export const publishArticle = async (props: IPublishArticleProps) => {
     const form = new FormData()
     // let key: keyof IPublishArticleProps
@@ -93,3 +92,5 @@ export const publishArticle = async (props: IPublishArticleProps) => {
     const result: string = res.data
     return result
 }
+
+export const deleteArticle = async (id: string, mandatory = false) => defaultServer.delete(`/article/${id}?mandatory=${mandatory}`).then<void>(res => res.data)

@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react'
-import useCountDown, { Options } from '..'
+import { Options, useCountDown } from '..'
 
 
 const setup = (options: Options = {}) => {
@@ -39,7 +39,7 @@ describe('hooks/useCountDowm', () => {
     })
 
     it('should initialize correctly with correct leftTime', () => {
-        const { result } = setup({ leftTime: 5000 })
+        const { result } = setup({ remainTime: 5000 })
         const [count, formatted] = result.current
 
         expect(count).toBe(5000)
@@ -100,7 +100,7 @@ describe('hooks/useCountDowm', () => {
     })
 
     it('should work a long time', () => {
-        const { result } = setup({ leftTime: 60 * 1000 })
+        const { result } = setup({ remainTime: 60 * 1000 })
 
         expect(result.current[0]).toBe(60000)
         expect(result.current[1].minutes).toBe(1)
@@ -122,7 +122,7 @@ describe('hooks/useCountDowm', () => {
 
     it('it onEnd should work', () => {
         const onEnd = vi.fn()
-        setup({ leftTime: 5000, onEnd })
+        setup({ remainTime: 5000, onEnd })
 
         act(() => {
             vi.advanceTimersByTime(5000)
@@ -139,9 +139,9 @@ describe('hooks/useCountDowm', () => {
         expect(result.current[1].seconds).toBe(0)
     });
 
-    it('should work stop and not trigger onEnd when post undefiend leftTime', () => {
+    it('should work stop and not trigger onEnd when post undefiend remainTime', () => {
         const onEnd = vi.fn()
-        const {result, rerender} = setup({leftTime: 5000, onEnd})
+        const {result, rerender} = setup({remainTime: 5000, onEnd})
 
         act(() => {
             vi.advanceTimersByTime(1000)
@@ -149,7 +149,7 @@ describe('hooks/useCountDowm', () => {
         expect(result.current[0]).toBe(4000)
         expect(result.current[1].seconds).toBe(4)
 
-        rerender({leftTime: undefined})
+        rerender({remainTime: undefined})
         expect(result.current[0]).toBe(0)
         expect(result.current[1].seconds).toBe(0)
         expect(onEnd).toBeCalledTimes(0)
@@ -164,7 +164,7 @@ describe('hooks/useCountDowm', () => {
 
     it('should work stop and not trigger onEnd when post undefiend targetDate', () => {
         const onEnd = vi.fn()
-        const {result, rerender} = setup({leftTime: 5000, onEnd})
+        const {result, rerender} = setup({remainTime: 5000, onEnd})
 
         act(() => {
             vi.advanceTimersByTime(1000)
@@ -187,7 +187,7 @@ describe('hooks/useCountDowm', () => {
 
     it('should countdown paused and continue when toggleStatus work', () => {
         const onEnd = vi.fn()
-        const {result} = setup({leftTime: 5000, onEnd})
+        const {result} = setup({remainTime: 5000, onEnd})
         const [, , toggle] = result.current
 
         act(() => {
@@ -221,7 +221,7 @@ describe('hooks/useCountDowm', () => {
 
     it('should countdown paused and continue when toggleStatus work manually', () => {
         const onEnd = vi.fn()
-        const {result} = setup({leftTime: 5000, onEnd})
+        const {result} = setup({remainTime: 5000, onEnd})
         const [, , toggle] = result.current
 
         // 不暂停，初始就是这样，没变化
@@ -270,7 +270,7 @@ describe('hooks/useCountDowm', () => {
 
     it('should toggleStatus work many times be not matter', () => {
         const onEnd = vi.fn()
-        const {result} = setup({leftTime: 5000, onEnd})
+        const {result} = setup({remainTime: 5000, onEnd})
         const [, , toggle] = result.current
 
         act(() => toggle())
@@ -303,7 +303,7 @@ describe('hooks/useCountDowm', () => {
 
     it('should stop working when unmount', () => {
         const onEnd = vi.fn()
-        const {result, unmount} = setup({leftTime: 5000, onEnd})
+        const {result, unmount} = setup({remainTime: 5000, onEnd})
 
         act(() => vi.advanceTimersByTime(1000))
         act(() => unmount())

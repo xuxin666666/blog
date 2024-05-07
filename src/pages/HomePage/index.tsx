@@ -14,7 +14,7 @@ import style from './index.module.less'
 const HomePage: React.FC = () => {
     const [playing, setPlaying] = useState(false)
     const [volumn, setVolumn] = useState(100)
-    const audio = useRef(new Audio(huaniaoFengyue))
+    const audio = useRef(new Audio())
     const {list: listData} = useHomePageListStore()
 
     useEffect(() => {
@@ -30,6 +30,12 @@ const HomePage: React.FC = () => {
         audio.current.volume = volumn / 100
     }, [volumn])
 
+    const play = () => {
+        // 播放时才开始加载资源
+        if(!audio.current.src) audio.current.src = huaniaoFengyue
+        setPlaying(true)
+    }
+
     return (
         <>
             <div className={classNames(style.welcome)}>
@@ -43,7 +49,7 @@ const HomePage: React.FC = () => {
                     </div>
                     <span>吾心吾行澄如明镜，所作所为皆为四季</span><br />
                     <span className='no-mobile'>（没找着合适的图片哎呀，放张好看的顶着）</span>
-                    {playing ? <MusicPlayingOutlined className={classNames(style.music)} onClick={() => setPlaying(false)} /> : <MusicPausingOutlined className={classNames(style.music)} onClick={() => setPlaying(true)} />}
+                    {playing ? <MusicPlayingOutlined className={classNames(style.music)} onClick={() => setPlaying(false)} /> : <MusicPausingOutlined className={classNames(style.music)} onClick={play} />}
                 </div>
                 <DownArrowWiderOutlined className={style.arrow} />
             </div>

@@ -55,10 +55,11 @@ const router = createBrowserRouter([{
                             element: <ArticleDetail />,
                             loader: articleDetailLoader
                         }
-                    }
+                    },
+                    errorElement: <Navigate to='/article' />
                 },
                 {
-                    path: '/article/write',
+                    path: '/article/write/:id?',
                     async lazy() {
                         const { default: ArticleWrite } = await import('./pages/Article/ArticleWrite.tsx')
                         return { element: <ArticleWrite /> }

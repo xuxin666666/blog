@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from "react"
-import { useMemoizedFn, useRequest, useUpdateEffect } from "ahooks"
+import React, { memo, useEffect, useRef } from "react"
+import { useMemoizedFn, useUpdateEffect } from "ahooks"
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useParams, useNavigate, Link } from "react-router-dom"
 import { Tag, Divider } from "antd"
@@ -7,36 +7,35 @@ import { EyeOutlined, LikeOutlined, ClockCircleOutlined, LineChartOutlined, TagO
 import classnames from 'classnames'
 import dayjs from "dayjs"
 
-import { getArticleList, getArticleStatistics } from "@/api/article"
 import SearchBox from "@/components/SearchBox"
-import { useArticleStore } from "./store"
-import type { IGetArticleListReturn, IGetArticleListProps } from "@/api/article"
+import { useStatisticsStore, useArticleStore, useTagStore } from "./store"
 import styles from './less/articleList.module.less'
+
 
 
 
 
 const TagsCard: React.FC<{
     className?: string
-}> = ({ className }) => {
+}> = memo(({ className }) => {
     const navigate = useNavigate()
 
-    const { tags} = useArticleStore()
+    const { data } = useTagStore()
 
     const tagClick = (tagName: string) => {
         if (window.location.pathname.includes('/article/tag')) navigate(`/article/tag/${tagName}`, { replace: true })
         else navigate(`/article/tag/${tagName}`)
     }
 
-    if (!tags.length) return null
+    if (!data.length) return null
     return (
         <div className={className}>
             <div className={styles.title}>
                 <TagOutlined className={styles.tag} />
-                标签({tags.length})
+                标签({data.length})
             </div>
             <div className={styles.content}>
-                {tags.map(tag => (
+                {data.map(tag => (
                     <Tag key={tag.tagName} onClick={() => tagClick(tag.tagName)}>
                         {tag.tagName} {tag.pageNum}
                     </Tag>
@@ -44,12 +43,13 @@ const TagsCard: React.FC<{
             </div>
         </div>
     )
-}
+})
+
 
 const StatisticsCard: React.FC<{
     className?: string
-}> = ({ className }) => {
-    const { data, loading } = useRequest(getArticleStatistics)
+}> = memo(({ className }) => {
+    const { data, loading } = useStatisticsStore()
 
     if (loading || !data) return null
     return (
@@ -78,49 +78,26 @@ const StatisticsCard: React.FC<{
             </div>
         </div>
     )
-}
+})
 
-
-const defaultProps = { page: 1, pageSize: 10, q: '', tags: [] }
 
 const ArticleList: React.FC = () => {
     const { tagName } = useParams()
 
-    const [loading, setLoading] = useState(false)
-    const [data, setData] = useState<IGetArticleListReturn>({ list: [], total: 0 })
-    const params = useRef<IGetArticleListProps>(defaultProps)
     const contentContainer = useRef<HTMLDivElement>(null)
+    const { data, getNewData, appendData } = useArticleStore()
 
-
-    const appendData = () => {
-        if (loading) return
-        setLoading(true)
-        params.current.page++
-        getArticleList(params.current).then(data => {
-            setData(prev => {
-                data.list = [...prev.list, ...data.list]
-                return data
-            })
-        }).finally(() => {
-            setLoading(false)
-        })
-    }
-
-    const getNewData = useMemoizedFn((props?: Partial<IGetArticleListProps>) => {
-        if (loading) return
-        setLoading(true)
-        params.current = { ...defaultProps, ...props }
-        getArticleList(params.current).then(data => {
-            setData(data)
-        }).finally(() => {
-            setLoading(false)
-        })
+    const getNewDataWithTag = useMemoizedFn((...args: Parameters<typeof getNewData>) => {
+        if (tagName) {
+            return getNewData({ tags: [tagName], ...args })
+        } else {
+            return getNewData(...args)
+        }
     })
 
     useEffect(() => {
-        if (!tagName) getNewData()
-        else getNewData({ tags: [tagName] })
-    }, [tagName, getNewData])
+        getNewDataWithTag()
+    }, [tagName, getNewDataWithTag])
 
     useUpdateEffect(() => {
         if (!contentContainer.current) return
@@ -128,13 +105,13 @@ const ArticleList: React.FC = () => {
     }, [tagName])
 
     const search = (val: string) => {
-        getNewData({ q: val })
+        getNewDataWithTag({ q: val })
     }
 
     return (
         <>
             <div className={styles['search-container']}>
-                {!tagName && <SearchBox className={styles.input} onSearch={search} />}
+                <SearchBox className={styles.input} onSearch={search} />
             </div>
 
             <div className={styles['content-container']} ref={contentContainer}>
@@ -224,8 +201,9 @@ const ArticleList: React.FC = () => {
                                     <div className={classnames(styles.text)}>{item.content}</div>
 
                                 </div>
-                                {/* <Image src={item.image} alt={item.image} className={styles.img} preview /> */}
-                                {item.image && <img src={item.image} alt={item.image} className={classnames(styles.img)} />}
+                                {item.image && (
+                                    <img src={item.image} alt={item.image} className={classnames(styles.img)} />
+                                )}
                             </div>
                             <div className={classnames(styles.actions)}>
                                 <div>

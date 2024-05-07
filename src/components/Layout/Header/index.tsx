@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import classnames from 'classnames'
 import { useEventListener } from "ahooks";
 import { Link } from "react-router-dom";
-import { Modal, Space, message } from "antd";
+import { Space, App } from "antd";
 import { LogoutOutlined } from '@ant-design/icons'
 
 import { HomeOutlined } from "@/components/Icons";
@@ -25,6 +25,8 @@ const Header: React.FC<{
     children?: React.ReactNode
     className?: string
 }> = ({ items = [], children, className }) => {
+    const {message, modal} = App.useApp()
+
     const { isLogin, logout } = useUserStore()
 
     const [navShow, setNavShow] = useState(true)
@@ -73,7 +75,7 @@ const Header: React.FC<{
     //#endregion
 
     const onLogout = () => {
-        Modal.confirm({
+        modal.confirm({
             title: '确定退出登录？',
             okText: '确定',
             cancelText: '取消',

@@ -39,8 +39,8 @@ dependencies:
     specifier: ^11.8.0
     version: 11.8.0
   hox:
-    specifier: ^2.1.0
-    version: 2.1.0(react@18.2.0)
+    specifier: ^2.1.1
+    version: 2.1.1(react@18.2.0)
   katex:
     specifier: ^0.16.7
     version: 0.16.7
@@ -4569,8 +4569,8 @@ packages:
       lru-cache: 6.0.0
     dev: true
 
-  /hox@2.1.0(react@18.2.0):
-    resolution: {integrity: sha512-8TihXk6RTh28295Pvwjj1ohvNuNT1oUbuAuoJzYed4JQ23lumVyfLVc1px2dvgkvdrjKpJXhT/qy7W5uJsCuaQ==}
+  /hox@2.1.1(react@18.2.0):
+    resolution: {integrity: sha512-POOE+kzaDXGbBVvMvhKnVRADg9R6yI14/FisHA8HyqKDAPCW1Owejyt/6yvQXngQo6s4OG6DLzAznOASPAJRDw==}
     peerDependencies:
       react: '>=16.8.0'
     dependencies:

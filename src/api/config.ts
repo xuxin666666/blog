@@ -47,7 +47,7 @@ defaultServer.interceptors.request.use(config => {
 defaultServer.interceptors.response.use(
     response => response,
     error => {
-        if(error.response.status === 401 && store.get('refreshToken')) {
+        if(error.response && error.response.status === 401 && store.get('refreshToken')) {
             if(!status.isRefreshing) {
                 status.isRefreshing = true
                 status.isSuccessed = false
